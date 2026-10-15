@@ -20,7 +20,8 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
   - **D1** hardware regression passed (#217); fixes F1/F5 (#218), F3/F4 (#219). **D2 Part 1** (Edge, Mac) passed and found the write-caret bug, fixed (#220); **D2 Part 2** (Windows 11, Chrome and Edge) passed, Windows added to Getting Started and README (#227). **D3** release wording done (#221).
   - **X5D/X5DR-only sounds** (D11 amended): marked ᴰ and hideable in the sound browsers, Drums kit list and Patch/Program browsers; per-sound categories; multi-select pills (#222, Landmine #127).
   - **D4 done** (#223): RC tester feedback (Brave on Linux works) folded into rc.1, no version bump. Merged after the owner's hardware pass: one Chromium-based browser note; browsers and Drums grids in rows with column-wrapping arrows (`gridNav.js`, Landmine #128); Drums grid arrow keys and focus; pills click = one, Shift adds; every number drags (knobs at ring scale) and single-click types, incl. in-ring (Landmine #68); EG Shift-drag axis lock; EQ Low above High; an open editor closes on a press elsewhere (Landmine #107). VDF/VDA column titles name each oscillator's sound (#224).
-- **Testing:** CI on `main` passes (16 test files, build). Locally, iCloud may evict `node_modules` so some test files can't start — check the file count (Landmine #95); with subagent worktrees present use `--exclude '.claude/**'` (Landmine #125).
+  - **E1–E4 done** (#229, #230): private repo frozen at `pre-public-cut` and backed up (three copies, bundles verified), renamed `x5dr-editor-private`; email privacy on (noreply address); public repo `Baylo1/x5dr-editor` created **private** from the single commit `ffe1ec8` (94 files, leak checks clean). Working copy now `~/Developer/x5dr-editor`, outside iCloud; the Desktop folder is the frozen private archive (don't edit it).
+- **Testing:** CI on `main` passes (16 test files, 510 tests, build). Report the file count, not just the pass count (Landmine #80); with subagent worktrees present use `--exclude '.claude/**'` (Landmine #125).
 
 ---
 
@@ -32,14 +33,15 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 - **Auditioning:** the editor sends no notes; modules need a DAW (Getting Started says so). **Untested models:** X5, X5D, 05R/W. **Windows:** ports usually need choosing by hand (no "x5" in the name, #227). **Linux:** Brave reported working by the RC tester (#223); Chrome/Edge on Linux unreported.
 - **Layout:** fixed 1400px app shell; no responsive intent below ~1200px (#98, #137).
 - **Won't Fix:** editing the device's Global MIDI Channel (front panel only, Landmine #57); B09; Live Server hot-reload.
-- **Toolchain:** `git` or tests stalling = iCloud eviction — Finder "Download Now", check `brctl status` / `find … -flags +dataless` (Landmine #95). Avoid `git log --follow` (#213). `src/` needs a server; the built file works over `file://`.
+- **Toolchain:** Avoid `git log --follow` (#213). `src/` needs a server; the built file works over `file://`.
 
 ---
 
 ## Current Next Actions
 
 1. **Phase 4, in order** (Release Plan; the owner's PHASE 4 task list mirrors it, §9):
-   - **E1** in progress (#229): `pre-public-cut` tag and private-repo backups (test Mac mirror + iCloud Drive bundle); record the bundle checks in the public repo after E4. Then E2–E7 (public cut; E4 extracts only the §10 allowlist — its term grep matches exactly four known files; E6 releases `v1.0.0`, owner publishes), then G2–G4 (demo video, announce, feedback routine).
+   - **E5 next:** ruleset, repo settings and labels, then the owner flips the repo to public and sets Pages to GitHub Actions. Then E6 (release `v1.0.0`, owner publishes; first public-repo backup), E7 (fresh-machine pass), then G2–G4 (demo video, announce, feedback routine).
+   - Before E5: merge `docs/e1-e4-record` (this record) and `chore/npm-audit-fix` (undici, dev tooling only) with the owner's approval.
 2. **Habits:** hardware tests use CI artifacts (the test Mac has no npm); push each branch for testing and ask before merging to `main`; never write the RC tester's name in docs (public-doc scrub, #214).
 
 ---
@@ -69,4 +71,4 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 
 ---
 
-*Last updated: 2026-10-15 — E1 freeze: checks passed, backup locations chosen (#229); last private-repo commit before the `pre-public-cut` tag. Next: finish E1's backups, then E2.*
+*Last updated: 2026-10-15 — E1–E4 recorded in the public repo (#230); Landmine #95 retired (working copy outside iCloud). Next: E5.*

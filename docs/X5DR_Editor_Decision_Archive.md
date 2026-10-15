@@ -5128,3 +5128,29 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Backup locations (E1 Decision, owner):** the hardware-test Mac (`~/Backups/x5dr-editor-private.git`, a mirror unpacked from the bundle) and **iCloud Drive** for the off-machine copy, as the single bundle file `x5dr-editor-private-pre-public-cut.bundle`, outside the project folder. GitHub is the third copy.
 
 **Sizes (for planning):** GitHub reports the private repo at ~127 MB packed (mostly `Reference Images/`), so the bundle and each mirror are ~130 MB. The public allowlist (§10) is 97 files, 4.3 MB.
+
+## Decision #230 — Release Plan E1–E4: Backups Verified, Private Repo Renamed, Email Privacy On, Public Repo Created
+
+**Context:** 2026-10-15. #229 was the last commit in the private repo before the `pre-public-cut` tag; the private repo is frozen after that, so E1's backup checks and E2–E4 are recorded here, in the first docs change of the public repo.
+
+**E1 — freeze and backup (finished):**
+- Private repo frozen at `main` `9709139`, tag `pre-public-cut` (tag object `122d463`), pushed; CI green.
+- Bundle `x5dr-editor-private-pre-public-cut.bundle`: 125 MB, 69 refs (66 branches, the tags `pre-audit-2026-09-30` and `pre-public-cut`, and HEAD). `git bundle verify` passed on every copy.
+- Three copies, as the backup policy asks: iCloud Drive (the single bundle file, in an "X5DR Backups" folder outside the project folder); the hardware-test Mac (`~/Backups/`: the bundle plus the mirror `x5dr-editor-private.git`, whose log starts at `9709139`, both tags present); GitHub.
+- The temporary mirror `~/x5dr-backup-temp` on the development Mac was deleted, as E1 says.
+
+**E2 — rename:** the old repo is now `Baylo1/x5dr-editor-private` (still private). The Desktop folder's `origin` points at it; that folder is the private archive checkout from now on and is not edited. The hardware-test Mac's old working clone was renamed `x5dr-editor-OLD` (delete it after E6).
+
+**E3 — email privacy:** GitHub "Keep my email addresses private" and "Block command line pushes that expose my email" are on. Global `user.email` is the noreply address, checked with a test commit.
+
+**E4 — public repo:**
+- Working copy (E4 Decision, owner): `~/Developer/x5dr-editor`, outside iCloud. Landmine #95 is retired as a result (below). The Claude Code project memory was carried over to the new path.
+- Extracted with §10's two `git archive` commands: 94 files (the §10 dry run on 2026-10-07 had 90; files added since).
+- `npm ci`; all 16 test files ran, 510 tests passed; `npm run build` produced a 978 KB `dist/index.html`.
+- Leak checks: the scrub-term grep lists only the four expected files; no PDFs or third-party `.syx` files; `Setup Instructions/` and `Reference Images/` absent. gitleaks: one false positive (ADR-0006 line 87, the prose "Velocity/After Touch Curve", rule `generic-api-key`).
+- Single commit `ffe1ec8` ("X5DR Editor v1.0.0 — initial public commit"), author and committer the noreply address. `gh repo create Baylo1/x5dr-editor --private`; CI green on `main` (run 38795427190).
+- `npm audit` reports 6 vulnerabilities (4 high) in `undici`, pulled in by the dev/test tooling only (nothing ships in `dist/`). Fixed on its own branch, `chore/npm-audit-fix`.
+
+**Landmine #95 retired (owner, 2026-10-15).** Release Plan H1 said to retire it once the working copy left iCloud, and E4 moved it. The entry keeps one line for the frozen Desktop archive checkout, which is still in iCloud. Progress Log: the iCloud notes under Testing and Toolchain removed. Project Context: the GitHub row now describes the public repo and the private archive.
+
+**Next:** E5 — configure the repo and flip it to public (owner's go/no-go).

@@ -48,7 +48,7 @@ In `docs/X5DR Manual Appendix - MIDI Implementation/`, transcribed by hand from 
 | VS Code | Editor / file browser |
 | `npx serve src` | Local dev server, port 5510 (`.claude/launch.json`). Beware stale module caching (Landmine #69) |
 | Chrome / Edge | Test browser |
-| Git / GitHub | `github.com/Baylo1/x5dr-editor` — private until the public cut, when it is renamed `x5dr-editor-private` and a new public `x5dr-editor` starts from a single commit (Release Plan E2–E4). Commit hashes cited before `v1.0.0` refer to the private archive |
+| Git / GitHub | `github.com/Baylo1/x5dr-editor` — started from a single commit (`ffe1ec8`, Release Plan E4); still private until E5 flips it public. Working copy `~/Developer/x5dr-editor`, outside iCloud. The pre-cut history is the private archive `Baylo1/x5dr-editor-private` (frozen at tag `pre-public-cut`; its Desktop checkout is not edited). Commit hashes cited before `v1.0.0` refer to that archive. Commits use the GitHub noreply email (E3) |
 | GitHub Actions | CI: tests + build + `dist/` artifact on every pushed branch. Deploy: on a published Release, GitHub Pages at `https://baylo1.github.io/x5dr-editor/` plus `dist/index.html` attached to the Release (live from E5–E6) |
 | Vitest | Unit tests for the communication/data layer only (`npx vitest run`) |
 | Snoize MIDI Monitor | Mac-only hardware capture — ground truth for parameter slots and device behavior |
@@ -86,4 +86,4 @@ The **BROWSER** toggle opens the Patch Browser (`openPatchBrowser()` → `enterB
 
 *This file keeps exactly one footer entry, replaced each session it's touched.*
 
-*Last updated: 2026-10-07 — Toolchain: GitHub row gives the repo plan (private archive, new public repo) and the hash note; new GitHub Actions row (CI, Deploy). Release Plan C4, Archive #214.*
+*Last updated: 2026-10-15 — Toolchain: GitHub row now describes the public repo (private until E5), the working copy outside iCloud and the private archive `x5dr-editor-private`. Release Plan E1–E4, Archive #230.*

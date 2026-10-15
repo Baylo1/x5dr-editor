@@ -664,7 +664,7 @@ Draft the post text once, adapt per venue, and keep the drafts in `docs/` (publi
 - Archive the private repo read-only on GitHub. Its E1 bundle and the hardware-test Mac mirror stay the offline copies; check that `git bundle verify` still passes.
 - Mark the task list's "PHASE 4" complete. Create a "v1.1" task-list group from H2.
 - Progress Log: Current Status → released; Next Actions → v1.1.
-- Retire Landmine #95 if the working copy moved out of iCloud (E4).
+- Retire Landmine #95 if the working copy moved out of iCloud (E4). *(Done 2026-10-15, Archive #230.)*
 
 ### H2. v1.1 backlog (from D11 and the Progress Log)
 
