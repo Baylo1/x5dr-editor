@@ -5146,6 +5146,7 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **E4 — public repo:**
 - Working copy (E4 Decision, owner): `~/Developer/x5dr-editor`, outside iCloud. Landmine #95 is retired as a result (below). The Claude Code project memory was carried over to the new path.
 - Extracted with §10's two `git archive` commands: 94 files (the §10 dry run on 2026-10-07 had 90; files added since).
+- *Correction:* Archive #229's "97 files" wrongly counted all of `reference_sysex/`, including the three third-party `.syx` files §10 excludes; the allowlist is 94 files.
 - `npm ci`; all 16 test files ran, 510 tests passed; `npm run build` produced a 978 KB `dist/index.html`.
 - Leak checks: the scrub-term grep lists only the four expected files; no PDFs or third-party `.syx` files; `Setup Instructions/` and `Reference Images/` absent. gitleaks: one false positive (ADR-0006 line 87, the prose "Velocity/After Touch Curve", rule `generic-api-key`).
 - Single commit `ffe1ec8` ("X5DR Editor v1.0.0 — initial public commit"), author and committer the noreply address. `gh repo create Baylo1/x5dr-editor --private`; CI green on `main` (run 38795427190).
