@@ -1,7 +1,7 @@
 ---
 name: Device report
 about: Tell us how the editor works with your X5, X5D, 05R/W (or X5DR)
-labels: device report
+labels: device-report
 ---
 
 Thanks! The X5, X5D and 05R/W are untested, so every report helps.
