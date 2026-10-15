@@ -1,0 +1,38 @@
+{
+  "name": "x5dr-editor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser-based real-time editor and librarian for the Korg X5DR synthesizer, over Web MIDI SysEx.",
+  "author": "Mark Baylis",
+  "license": "MIT",
+  "homepage": "https://baylo1.github.io/x5dr-editor/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Baylo1/x5dr-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Baylo1/x5dr-editor/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "build": "node scripts/build.mjs",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "keywords": [
+    "korg",
+    "x5dr",
+    "x5d",
+    "05r/w",
+    "synthesizer",
+    "midi",
+    "sysex",
+    "web-midi",
+    "editor",
+    "librarian"
+  ],
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "vitest": "^4.1.8"
+  }
+}

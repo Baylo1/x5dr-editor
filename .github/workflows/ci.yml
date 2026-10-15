@@ -1,0 +1,89 @@
+# CI: test + build on every pushed branch, every PR to main, and on demand.
+# Every run uploads dist/ as a downloadable artifact so any branch can be
+# hardware-tested on a computer without npm (Release Plan A3, D5).
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit tests
+        run: npx vitest run
+
+      - name: Build dist/index.html
+        run: npm run build
+
+      # Artifact names cannot contain '/', so sanitize the branch name.
+      # PRs are named after the PR number and its head commit.
+      - name: Compute artifact name
+        id: name
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            branch="$PR_HEAD_REF"
+            sha="$PR_HEAD_SHA"
+            prefix="pr-${PR_NUMBER}-"
+          else
+            branch="$GITHUB_REF_NAME"
+            sha="$GITHUB_SHA"
+            prefix=""
+          fi
+          safe_branch=$(printf '%s' "$branch" | tr -c 'A-Za-z0-9._-' '-')
+          short_sha="${sha:0:7}"
+          echo "artifact=x5dr-editor-${prefix}${safe_branch}-${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$short_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Upload dist/
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.name.outputs.artifact }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Job summary
+        env:
+          ARTIFACT: ${{ steps.name.outputs.artifact }}
+          BRANCH: ${{ steps.name.outputs.branch }}
+          SHORT_SHA: ${{ steps.name.outputs.short_sha }}
+        run: |
+          {
+            echo "## X5DR Editor build"
+            echo ""
+            echo "- Branch: \`$BRANCH\`"
+            echo "- Commit: \`$SHORT_SHA\`"
+            echo "- Artifact: \`$ARTIFACT\` (kept 30 days)"
+            echo ""
+            echo "Download the artifact from the **Artifacts** section of this run, unzip it,"
+            echo "and open \`index.html\` directly from disk in Chrome or Edge (no server or npm needed)."
+          } >> "$GITHUB_STEP_SUMMARY"

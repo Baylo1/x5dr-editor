@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "x5dr-editor",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "serve",
+        "src",
+        "-l",
+        "5510",
+        "--no-clipboard"
+      ],
+      "port": 5510
+    },
+    {
+      "name": "x5dr-dist",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "serve",
+        "dist",
+        "-l",
+        "5520",
+        "--no-clipboard"
+      ],
+      "port": 5520
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Email the maintainer
+    url: mailto:x5dr-editor-feedback@baylisconsulting.com
+    about: If you don't use GitHub, report by email instead. Reports may be copied into Issues, without your personal identifying details.

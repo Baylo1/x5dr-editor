@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# VS Code
+.vscode/
+.obsidian/
+
+# Reference material (other synths' editors, kept locally for inspection only)
+/S1 Editor/
+
+# npm dependencies (dev/test tooling only; restore with `npm install`)
+node_modules/
+
+# Single-file build output (npm run build); never edit or commit
+dist/
