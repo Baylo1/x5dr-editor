@@ -476,6 +476,7 @@
 | 2026-10-10 | The RC tester's Linux and usability feedback is folded into `1.0.0-rc.1` (no version bump) and handled as the rc.1 pre-release feedback round, Release Plan D4: sound and patch browsers numbered in rows; category pills select one, Shift adds; EG stage numbers draggable; Shift-drag axis lock on EG curves; EQ Low above EQ High. E1 waits for D4 and D2 Part 2 | rc.1 was never tagged or released and CHANGELOG lists it as unreleased, so there is no released version to bump past; the CI build stamp tells pre-release builds apart. All five changes are UI-only (no device-protocol change). See Critical Discovery #223 |
 | 2026-10-12 | v1.1 backlog additions: a random patch generator (Easy-tab panels) and a rudimentary keyboard; Multisound Solo's approach outlined. Brainstorm only, nothing scheduled | Owner brainstorm. The task list's "V1.1 items for consideration" group and Release Plan H2 now hold the same items. See Critical Discovery #225 |
 | 2026-10-12 | v1.1 backlog addition: AI patch generation, JSON import/export and an "AI patch kit" first, an in-editor chat tab possibly later. Brainstorm only, nothing scheduled | Owner brainstorm. See Critical Discovery #226 |
+| 2026-10-15 | Public cut done and `v1.0.0` released: private repo frozen and renamed `x5dr-editor-private`; public `Baylo1/x5dr-editor` from one commit, now public; site live from the GitHub Release. Working copy moved outside iCloud (Landmine #95 retired) | Release Plan E1–E6 (#229–#232). No public rc (#228); E7 and the announcement still to come |
 
 ---
 
@@ -5174,3 +5175,20 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Verified (2026-10-15):** visibility PUBLIC; an unauthenticated API request sees the repo and 94 files on `main`; custom social preview set; ruleset active with `deletion` and `non_fast_forward` on `~DEFAULT_BRANCH`; secret scanning and push protection enabled; private vulnerability reporting enabled; Pages `build_type` = `workflow`; environment policies `main` (branch) and `v*` (tag). README/CONTRIBUTING links resolve, except the Pages URL, which is 404 until E6's first deploy. CI green on the public repo: a re-run of `main` (attempt 2) and a manual `workflow_dispatch` run (38805267507), both at `27200ea`. A re-run reuses the same row in Actions → CI, so it doesn't appear as a new entry.
 
 **Next:** E6 — release `v1.0.0` (owner publishes; first deploy; first public-repo backup).
+
+## Decision #232 — Release Plan E6: `v1.0.0` Released; Site Live
+
+**Context:** 2026-10-15. E5 (#231) made the repo public and set up Pages. E6 publishes the first public release, which also proves `deploy.yml` for the first time.
+
+**Done:**
+- `release/v1.0.0-changelog`: the CHANGELOG heading `[1.0.0] — unreleased` became `[1.0.0] — 2026-10-15`; merged to `main` at `ada8bf1` (owner's approval), CI green. The version was already `1.0.0` in `package.json`, `package-lock.json` and `APP_VERSION` (#228).
+- Annotated tag `v1.0.0` on `ada8bf1`, tagger the noreply address, pushed. Pushing a tag starts no workflow (CI runs on branch pushes; Deploy on a published Release).
+- The owner published the Release with `gh release create v1.0.0 --verify-tag --title "X5DR Editor v1.0.0" --notes-file <the CHANGELOG's [1.0.0] section>`; not a pre-release.
+
+**Verified:**
+- Deploy run 38806622116 green: tag/version check, tests, build, Pages deploy (the `v*` environment rule from #231 let the tag deploy) and the attach job.
+- The Release has one asset, `index.html` (1,015,798 bytes, the same size as the local build of `ada8bf1`).
+- `https://baylo1.github.io/x5dr-editor/` returns 200 with `APP_VERSION = '1.0.0'`; `manifest.json` returns 200. The owner opened the site on the development Mac and it loaded. Hardware use of the live site (MIDI prompt, SysEx) is checked on the hardware-test Mac in E7.
+- Project Plan: the GitHub Pages and v1.0 tag checkboxes are ticked; "Test on a clean machine" stays open for E7.
+
+**Not done yet:** E6's backup of the public repo (mirror and bundle on the hardware-test Mac, bundle copy to iCloud Drive). It is the next task, before E7.

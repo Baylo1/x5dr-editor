@@ -225,14 +225,14 @@ Full architecture, all ten cross-cutting decisions, and both post-implementation
 
 - [x] **Single-file distribution build** — `npm run build` (`scripts/build.mjs`) inlines all 11 `src/` modules and embeds the fonts into `dist/index.html` (Archive #200); hardware smoke test passed, and the built file works over `file://` in Chrome and Edge (Release Plan A2, Archive #202–#203, Landmine #103). Release steps: `X5DR_Editor_Release_Plan.md`.
 - [x] CI and Deploy workflows: CI tests and builds every pushed branch; Deploy publishes to GitHub Pages on a published Release (Release Plan A3, Archive #207)
-- [ ] Set up GitHub Pages hosting (serve `dist/index.html`) — Release Plan E5–E6
+- [x] Set up GitHub Pages hosting (serve `dist/index.html`) — live at `https://baylo1.github.io/x5dr-editor/` since the `v1.0.0` Release (Release Plan E5–E6, Archive #231, #232)
 - [x] MIT License added to the repo and `index.html` (SPDX identifier)
 - [x] In-app Help menu: Getting Started, Troubleshooting, Report a Problem, Copy Diagnostics, About (Archive #181, #182); release text (Release Plan C2, Archive #212)
 - [x] Title bar color and `manifest.json`; app icons and local install done (Release Plan B1–B2, Archive #209, #211)
 - [x] Write user-facing README (setup instructions, Chrome requirement, port selector guidance) — Release Plan C3, Archive #213
 - ~~Write Windows setup notes (loopMIDI equivalent of IAC Driver)~~ — obsolete: the editor talks to the MIDI interface directly (Archive #199)
 - [ ] Test on a clean machine (no prior setup) — Release Plan E7
-- [ ] Tag v1.0 release on GitHub — Release Plan E6 (`v1.0.0`)
+- [x] Tag v1.0 release on GitHub — `v1.0.0` tagged and published 2026-10-15 (Release Plan E6, Archive #232)
 
 ---
 
