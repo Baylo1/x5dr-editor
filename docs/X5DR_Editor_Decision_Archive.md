@@ -5155,3 +5155,22 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Landmine #95 retired (owner, 2026-10-15).** Release Plan H1 said to retire it once the working copy left iCloud, and E4 moved it. The entry keeps one line for the frozen Desktop archive checkout, which is still in iCloud. Progress Log: the iCloud notes under Testing and Toolchain removed. Project Context: the GitHub row now describes the public repo and the private archive.
 
 **Next:** E5 — configure the repo and flip it to public (owner's go/no-go).
+
+## Decision #231 — Release Plan E5: Repo Configured and Public
+
+**Context:** 2026-10-15. E4 (#230) created `Baylo1/x5dr-editor` private from one commit. E5 configures it and flips it public, the point of no return.
+
+**Before the flip (Claude, via `gh`):** description and homepage (`https://baylo1.github.io/x5dr-editor/`); Issues on, Discussions/Wiki/Projects off (Projects had been on by default); the seven topics; labels `device-report`, `needs-info`, `v1.1` added beside the defaults (`bug` and `enhancement` already existed); Dependabot alerts on.
+
+**Device report label fix (`fix/device-report-label`):** `.github/ISSUE_TEMPLATE/device_report.md` asked for `labels: device report` (a space), while the label E5 creates is `device-report`, so device reports would have arrived unlabelled. The template now uses `device-report`.
+
+**The flip and after (owner):** visibility → public; social preview uploaded (`src/icons/social-preview-1280x640.png`); ruleset `main` (default branch: no deletion, no force-push; PRs not required); secret scanning and push protection on; private vulnerability reporting on; Pages source → GitHub Actions; a `v*` tag rule on the `github-pages` environment.
+
+**Two plan gaps found, Release Plan E5 amended:**
+- **Social preview only after the flip.** GitHub shows the Social preview setting on a private repo only if an image was uploaded before, so it can't be done first.
+- **`github-pages` needs a `v*` tag rule.** Turning Pages on creates the environment with a deployment rule for `main` only. `deploy.yml` runs on a published Release, i.e. from the tag, so without the rule E6's deploy job would most likely be refused. The environment now allows `main` and `v*`.
+- Also noted in E5: on the free plan the ruleset, secret scanning and private vulnerability reporting are public-repo features, so they come after the flip too.
+
+**Verified (2026-10-15):** visibility PUBLIC; an unauthenticated API request sees the repo and 94 files on `main`; custom social preview set; ruleset active with `deletion` and `non_fast_forward` on `~DEFAULT_BRANCH`; secret scanning and push protection enabled; private vulnerability reporting enabled; Pages `build_type` = `workflow`; environment policies `main` (branch) and `v*` (tag). README/CONTRIBUTING links resolve, except the Pages URL, which is 404 until E6's first deploy. CI green on the public repo: a re-run of `main` (attempt 2) and a manual `workflow_dispatch` run (38805267507), both at `27200ea`. A re-run reuses the same row in Actions → CI, so it doesn't appear as a new entry.
+
+**Next:** E6 — release `v1.0.0` (owner publishes; first deploy; first public-repo backup).

@@ -10,7 +10,7 @@ A browser-based, real-time parameter editor and patch loader/saver for the **Kor
 
 ## Platform
 
-**Browser app: HTML/CSS/JS + Web MIDI API, Chrome and Edge only** (Safari/Firefox lack Web MIDI — accepted for this audience). Chosen over Python for distribution ("open a web page" vs installers that antivirus flags), CSS design freedom, and native SysEx support. To be hosted on GitHub Pages (`https://` secure context, from Release Plan E5); the built single file also works opened from disk (`file://`, Landmine #103). No frameworks; npm is used only for tests and `npm run build`, which inlines `src/` into one self-contained `dist/index.html` (Landmine #123). CI (GitHub Actions) tests and builds every pushed branch.
+**Browser app: HTML/CSS/JS + Web MIDI API, Chrome and Edge only** (Safari/Firefox lack Web MIDI — accepted for this audience). Chosen over Python for distribution ("open a web page" vs installers that antivirus flags), CSS design freedom, and native SysEx support. Hosted on GitHub Pages (`https://` secure context, from the first Release at Release Plan E6); the built single file also works opened from disk (`file://`, Landmine #103). No frameworks; npm is used only for tests and `npm run build`, which inlines `src/` into one self-contained `dist/index.html` (Landmine #123). CI (GitHub Actions) tests and builds every pushed branch.
 
 **Design reference:** the Korg M1 VST plugin — dark panel, tabbed sections, envelope displays.
 
@@ -48,8 +48,8 @@ In `docs/X5DR Manual Appendix - MIDI Implementation/`, transcribed by hand from 
 | VS Code | Editor / file browser |
 | `npx serve src` | Local dev server, port 5510 (`.claude/launch.json`). Beware stale module caching (Landmine #69) |
 | Chrome / Edge | Test browser |
-| Git / GitHub | `github.com/Baylo1/x5dr-editor` — started from a single commit (`ffe1ec8`, Release Plan E4); still private until E5 flips it public. Working copy `~/Developer/x5dr-editor`, outside iCloud. The pre-cut history is the private archive `Baylo1/x5dr-editor-private` (frozen at tag `pre-public-cut`; its Desktop checkout is not edited). Commit hashes cited before `v1.0.0` refer to that archive. Commits use the GitHub noreply email (E3) |
-| GitHub Actions | CI: tests + build + `dist/` artifact on every pushed branch. Deploy: on a published Release, GitHub Pages at `https://baylo1.github.io/x5dr-editor/` plus `dist/index.html` attached to the Release (live from E5–E6) |
+| Git / GitHub | `github.com/Baylo1/x5dr-editor` — **public** since Release Plan E5, started from a single commit (`ffe1ec8`, E4). Ruleset on `main`: no force-push, no deletion. Working copy `~/Developer/x5dr-editor`, outside iCloud. The pre-cut history is the private archive `Baylo1/x5dr-editor-private` (frozen at tag `pre-public-cut`; its Desktop checkout is not edited). Commit hashes cited before `v1.0.0` refer to that archive. Commits use the GitHub noreply email (E3) |
+| GitHub Actions | CI: tests + build + `dist/` artifact on every pushed branch. Deploy: on a published Release, GitHub Pages at `https://baylo1.github.io/x5dr-editor/` plus `dist/index.html` attached to the Release (live from E6). The `github-pages` environment allows `main` and `v*` tags (Archive #231) |
 | Vitest | Unit tests for the communication/data layer only (`npx vitest run`) |
 | Snoize MIDI Monitor | Mac-only hardware capture — ground truth for parameter slots and device behavior |
 
@@ -86,4 +86,4 @@ The **BROWSER** toggle opens the Patch Browser (`openPatchBrowser()` → `enterB
 
 *This file keeps exactly one footer entry, replaced each session it's touched.*
 
-*Last updated: 2026-10-15 — Toolchain: GitHub row now describes the public repo (private until E5), the working copy outside iCloud and the private archive `x5dr-editor-private`. Release Plan E1–E4, Archive #230.*
+*Last updated: 2026-10-15 — Platform and Toolchain: repo public with a `main` ruleset; Pages from E6; `github-pages` tag rule. Release Plan E5, Archive #231.*

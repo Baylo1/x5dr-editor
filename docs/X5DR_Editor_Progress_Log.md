@@ -20,7 +20,8 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
   - **D1** hardware regression passed (#217); fixes F1/F5 (#218), F3/F4 (#219). **D2 Part 1** (Edge, Mac) passed and found the write-caret bug, fixed (#220); **D2 Part 2** (Windows 11, Chrome and Edge) passed, Windows added to Getting Started and README (#227). **D3** release wording done (#221).
   - **X5D/X5DR-only sounds** (D11 amended): marked ᴰ and hideable in the sound browsers, Drums kit list and Patch/Program browsers; per-sound categories; multi-select pills (#222, Landmine #127).
   - **D4 done** (#223): RC tester feedback (Brave on Linux works) folded into rc.1, no version bump. Merged after the owner's hardware pass: one Chromium-based browser note; browsers and Drums grids in rows with column-wrapping arrows (`gridNav.js`, Landmine #128); Drums grid arrow keys and focus; pills click = one, Shift adds; every number drags (knobs at ring scale) and single-click types, incl. in-ring (Landmine #68); EG Shift-drag axis lock; EQ Low above High; an open editor closes on a press elsewhere (Landmine #107). VDF/VDA column titles name each oscillator's sound (#224).
-  - **E1–E4 done** (#229, #230): private repo frozen at `pre-public-cut` and backed up (three copies, bundles verified), renamed `x5dr-editor-private`; email privacy on (noreply address); public repo `Baylo1/x5dr-editor` created **private** from the single commit `ffe1ec8` (94 files, leak checks clean). Working copy now `~/Developer/x5dr-editor`, outside iCloud; the Desktop folder is the frozen private archive (don't edit it).
+  - **E1–E4 done** (#229, #230): private repo frozen at `pre-public-cut` and backed up (three copies, bundles verified), renamed `x5dr-editor-private`; email privacy on (noreply address); public repo `Baylo1/x5dr-editor` created from the single commit `ffe1ec8` (94 files, leak checks clean).
+  - **E5 done** (#231): the repo is **public**; settings, labels, ruleset, security features and social preview set; Pages source = GitHub Actions, with a `v*` tag rule on the `github-pages` environment so the Release deploy is allowed. The site is a 404 until E6. Working copy now `~/Developer/x5dr-editor`, outside iCloud; the Desktop folder is the frozen private archive (don't edit it).
 - **Testing:** CI on `main` passes (16 test files, 510 tests, build). Report the file count, not just the pass count (Landmine #80); with subagent worktrees present use `--exclude '.claude/**'` (Landmine #125).
 
 ---
@@ -40,8 +41,7 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 ## Current Next Actions
 
 1. **Phase 4, in order** (Release Plan; the owner's PHASE 4 task list mirrors it, §9):
-   - **E5 next:** ruleset, repo settings and labels, then the owner flips the repo to public and sets Pages to GitHub Actions. Then E6 (release `v1.0.0`, owner publishes; first public-repo backup), E7 (fresh-machine pass), then G2–G4 (demo video, announce, feedback routine).
-   - Before E5: merge `docs/e1-e4-record` (this record) and `chore/npm-audit-fix` (undici, dev tooling only) with the owner's approval.
+   - **E6 next:** date the CHANGELOG, tag `v1.0.0`, the owner publishes the Release; `deploy.yml`'s first run (Pages + Release asset); first public-repo backup. Then E7 (fresh-machine pass), then G2–G4 (demo video, announce, feedback routine). Merge `docs/e5-record` first, with the owner's approval.
 2. **Habits:** hardware tests use CI artifacts (the test Mac has no npm); push each branch for testing and ask before merging to `main`; never write the RC tester's name in docs (public-doc scrub, #214).
 
 ---
@@ -71,4 +71,4 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 
 ---
 
-*Last updated: 2026-10-15 — E1–E4 recorded in the public repo (#230); Landmine #95 retired (working copy outside iCloud). Next: E5.*
+*Last updated: 2026-10-15 — E5 done: repo public and configured (#231). Next: E6.*

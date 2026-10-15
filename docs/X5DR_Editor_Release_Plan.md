@@ -527,14 +527,21 @@ Also run `npx gitleaks detect` (or `trufflehog filesystem .`) on the single comm
 
 ### E5. Configure the repo and go public
 
+*Amended 2026-10-15 (Archive #231): reordered so the steps that need a public repo come after the flip; added the `github-pages` tag rule. Done 2026-10-15.*
+
 **What.**
-- Ruleset on `main`: no force-push, no deletion. Requiring PRs is optional for a solo project; recommended **off**, so you can still push docs directly.
-- Issues on; Discussions, Wiki and Projects off (D14).
-- Description, topics (`korg`, `x5dr`, `05rw`, `web-midi`, `sysex`, `synthesizer`, `editor`), social preview image (from B1/C3).
-- Dependabot alerts, secret scanning and private vulnerability reporting on.
-- Labels: `bug`, `device-report`, `enhancement`, `needs-info`, `v1.1`.
+- **While private:**
+  - Issues on; Discussions, Wiki and Projects off (D14).
+  - Description, homepage, topics (`korg`, `x5dr`, `05rw`, `web-midi`, `sysex`, `synthesizer`, `editor`).
+  - Labels: `bug`, `device-report`, `enhancement`, `needs-info`, `v1.1`. The device report template's `labels:` line must name `device-report` exactly, or reports arrive unlabelled.
+  - Dependabot alerts on.
 - **Flip visibility to public.**
-- Settings → Pages → Source: **GitHub Actions**.
+- **After the flip** (public-repo features on the free plan):
+  - Social preview image (from B1/C3, `src/icons/social-preview-1280x640.png`). GitHub hides this setting on a private repo that never had one.
+  - Ruleset on `main`: no force-push, no deletion. Requiring PRs is optional for a solo project; recommended **off**, so you can still push docs directly.
+  - Secret scanning (with push protection) and private vulnerability reporting on.
+  - Settings → Pages → Source: **GitHub Actions**.
+  - Settings → Environments → `github-pages` → Deployment branches and tags: add a **tag** rule `v*`. Turning Pages on allows only `main`, but `deploy.yml` runs from the Release's tag, so E6's deploy would be refused without it.
 
 **Why.** Pages on the free plan needs a public repo. Last chance to stop before exposure.
 
