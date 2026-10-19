@@ -5192,3 +5192,19 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 - Project Plan: the GitHub Pages and v1.0 tag checkboxes are ticked; "Test on a clean machine" stays open for E7.
 
 **Not done yet:** E6's backup of the public repo (mirror and bundle on the hardware-test Mac, bundle copy to iCloud Drive). It is the next task, before E7.
+
+## Decision #233 — Release Plan E6: First Backup of the Public Repo
+
+**Context:** 2026-10-19. The last E6 step (#232): the first backup of `Baylo1/x5dr-editor` under the E1 backup policy (#216). The repo is public, so the hardware-test Mac cloned it over HTTPS with no login.
+
+**Done (owner, on the hardware-test Mac):**
+- `git clone --mirror https://github.com/Baylo1/x5dr-editor.git ~/Backups/x5dr-editor.git`, beside the private repo's mirror from E1.
+- `git -C ~/Backups/x5dr-editor.git bundle create x5dr-editor-v1.0.0.bundle --all`; the bundle sits inside the mirror folder. A copy went to iCloud Drive's "X5DR Backups" folder, next to the private repo's E1 bundle. GitHub is the third copy.
+
+**Verified:** `git bundle verify` passed on both copies ("The bundle records a complete history", "is okay"), with identical output: 10 refs — `main` and HEAD at `8e7c76e` (the #232 commit, the latest on `main`), tag `v1.0.0` (tag object `8cf5d4d` → `ada8bf1`), and the seven branches pushed and merged since E4 (`chore/npm-audit-fix`, `docs/archive-230-file-count`, `docs/e1-e4-record`, `docs/e5-record`, `docs/e6-record`, `fix/device-report-label`, `release/v1.0.0-changelog`). SHA-1.
+
+**Tip:** `git bundle verify` can refuse to run outside a repository, so run it as `git -C <mirror> bundle verify <full path to bundle>` (with `-C`, relative paths resolve from the mirror folder). An iCloud copy must be downloaded locally first, or the read stalls.
+
+**Refresh:** at every release (E1 policy): `git -C ~/Backups/x5dr-editor.git fetch --prune`, a new `x5dr-editor-vX.Y.Z.bundle`, verify, copy to iCloud Drive.
+
+**Next:** E7 — fresh-machine / first-run pass.

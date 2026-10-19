@@ -556,7 +556,7 @@ Also run `npx gitleaks detect` (or `trufflehog filesystem .`) on the single comm
 
 ### E6. Release `v1.0.0`
 
-*Done 2026-10-15 except the backup (Archive #232).*
+*Done: release 2026-10-15 (Archive #232); backup 2026-10-19 (Archive #233).*
 
 *Amended 2026-10-15 (owner, Archive #228): was the unannounced `v1.0.0-rc.1` pre-release; Stage F is complete, so this is the 1.0.0 release (formerly G1). The version bump to `1.0.0` (`package.json`, `package-lock.json`, `APP_VERSION`) and the CHANGELOG entry are already merged.*
 

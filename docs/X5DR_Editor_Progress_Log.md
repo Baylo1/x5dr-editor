@@ -19,7 +19,7 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 - **Phase 4** (`X5DR_Editor_Release_Plan.md`, #199; no public rc, #228):
   - **Stages A–D done** (#200–#227): single-file build (Landmine #123), `file://` (Landmine #103), CI, icons/manifest, Help text, README/CHANGELOG, doc scrub, §10 allowlist; D1 hardware regression and fixes (#217–#219); D2 Edge/Mac and Windows 11 (#220, #227); D3 wording (#221); X5D/X5DR-only sounds (#222, Landmine #127); D4 RC feedback (#223, Landmines #68, #107, #128); VDF/VDA column titles (#224).
   - **E1–E5 done** (#229–#231): private repo frozen at `pre-public-cut`, backed up (three copies) and renamed `x5dr-editor-private`; noreply email; public repo from the single commit `ffe1ec8` (94 files); repo configured and flipped public, with a `v*` tag rule on the `github-pages` environment. Working copy `~/Developer/x5dr-editor`, outside iCloud; the Desktop folder is the frozen private archive (don't edit it).
-  - **E6 done except the backup** (#232): CHANGELOG dated, `v1.0.0` tagged and published by the owner; deploy green; site checked on the development Mac.
+  - **E6 done** (#232, #233): CHANGELOG dated, `v1.0.0` tagged and published by the owner; deploy green; site checked on the development Mac. Public repo backed up (mirror + `x5dr-editor-v1.0.0.bundle` on the hardware-test Mac, bundle in iCloud Drive; both verified).
 - **Testing:** CI on `main` passes (16 test files, 510 tests, build). Report the file count, not just the pass count (Landmine #80); with subagent worktrees present use `--exclude '.claude/**'` (Landmine #125).
 
 ---
@@ -39,8 +39,8 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 ## Current Next Actions
 
 1. **Phase 4, in order** (Release Plan; the owner's PHASE 4 task list mirrors it, §9):
-   - **Next: the public repo's first backup** (E6, E1 policy): mirror and bundle on the hardware-test Mac (`~/Backups/x5dr-editor.git`, `x5dr-editor-v1.0.0.bundle`), bundle copy to iCloud Drive, `git bundle verify` both; refresh at every release.
-   - Then **E7** (fresh-machine / first-run pass, incl. the live site on the hardware-test Mac), then G2–G4 (demo video, announce, feedback routine), then H1 housekeeping.
+   - **Next: E7** (fresh-machine / first-run pass, incl. the live site with the X5DR on the hardware-test Mac). Then G2–G4 (demo video, announce, feedback routine), then H1 housekeeping.
+   - **Backups:** refresh the public repo's mirror and bundle at every release (E1 policy; `git fetch` in the mirror, new bundle, `git bundle verify`).
 2. **Habits:** hardware tests use CI artifacts (the test Mac has no npm); push each branch for testing and ask before merging to `main`; never write the RC tester's name in docs (public-doc scrub, #214).
 
 ---
@@ -70,4 +70,4 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 
 ---
 
-*Last updated: 2026-10-15 — `v1.0.0` released and live (#232). Next: the public repo's first backup, then E7.*
+*Last updated: 2026-10-19 — E6 complete: public repo backed up and verified (#233). Next: E7.*
