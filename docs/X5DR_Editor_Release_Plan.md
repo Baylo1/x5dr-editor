@@ -582,6 +582,8 @@ Also run `npx gitleaks detect` (or `trufflehog filesystem .`) on the single comm
 
 ### E7. Fresh-machine / first-run pass
 
+*Done 2026-10-19 (Archive #235): a Mac with the X5DR, Chrome incognito and Edge with no profile standing in for a fresh machine; the Windows PC wasn't available (D2 Part 2 covers Windows, #227). All items passed, no friction.*
+
 **What.** On the **second Mac (new Chrome profile)** and the **Windows PC with the X5DR**, from the Pages URL:
 1. The SysEx permission prompt appears; check both allow and deny.
 2. Getting Started auto-opens on first launch and stays dismissed after reload.

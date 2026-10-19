@@ -231,7 +231,7 @@ Full architecture, all ten cross-cutting decisions, and both post-implementation
 - [x] Title bar color and `manifest.json`; app icons and local install done (Release Plan B1–B2, Archive #209, #211)
 - [x] Write user-facing README (setup instructions, Chrome requirement, port selector guidance) — Release Plan C3, Archive #213
 - ~~Write Windows setup notes (loopMIDI equivalent of IAC Driver)~~ — obsolete: the editor talks to the MIDI interface directly (Archive #199)
-- [ ] Test on a clean machine (no prior setup) — Release Plan E7
+- [x] Test on a clean machine (no prior setup) — Release Plan E7, passed 2026-10-19 on a Mac (Chrome incognito, Edge with no profile; Archive #235)
 - [x] Tag v1.0 release on GitHub — `v1.0.0` tagged and published 2026-10-15 (Release Plan E6, Archive #232)
 
 ---

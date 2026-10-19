@@ -5222,3 +5222,15 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Docs:** Release Plan backup policy ("Three copies" amended), E2 (clone deleted), E6 and G4 bundle commands (full path), H1 (private repo: bundle only). Progress Log updated. #233's "the bundle sits inside the mirror folder" is superseded by this entry.
 
 **`~/Backups/` on the hardware-test Mac now:** `x5dr-editor-private-pre-public-cut.bundle`, `x5dr-editor-v1.0.0.bundle`, `x5dr-editor.git/`.
+
+## Decision #235 — Release Plan E7: First-Run Pass Passed; Stage E Complete
+
+**Context:** 2026-10-19. E7 checks the released `v1.0.0` as a first-time user would meet it. The plan named a second Mac with a new Chrome profile and the Windows PC with the X5DR.
+
+**What was tested (owner):** a Mac with the X5DR connected, in a **Chrome incognito window** and an **Edge window with no profile**, standing in for a fresh machine (no saved MIDI permission, `localStorage` or install). Both from the Pages URL and from the Release's `index.html` opened over `file://`. All E7 items passed: SysEx prompt (allow and deny), Getting Started on first launch and staying dismissed after reload, port auto-select, Import From Device, a live edit, Write In Place, **install as app from Pages** (Dock icon, title bar, uninstall), the `file://` run, Report a Problem and Copy Diagnostics.
+
+**Friction:** none reported, so no wording fixes and no `v1.0.1` before the announcement.
+
+**Not covered (owner's decision):** the Windows PC wasn't available. Windows Chrome and Edge were hardware-tested in D2 Part 2 from a CI build of the same code (#227); the live site on Windows will first be exercised by users. Progress Log's Known Outliers says so.
+
+**Result:** Stage E (public cut) is complete. The Project Plan's "Test on a clean machine" checkbox is ticked, which closes the Phase 4 checklist. The release stays unannounced until G2 (demo video) and G3 (announcement).
