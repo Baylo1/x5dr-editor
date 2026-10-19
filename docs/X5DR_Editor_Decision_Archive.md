@@ -477,6 +477,7 @@
 | 2026-10-12 | v1.1 backlog additions: a random patch generator (Easy-tab panels) and a rudimentary keyboard; Multisound Solo's approach outlined. Brainstorm only, nothing scheduled | Owner brainstorm. The task list's "V1.1 items for consideration" group and Release Plan H2 now hold the same items. See Critical Discovery #225 |
 | 2026-10-12 | v1.1 backlog addition: AI patch generation, JSON import/export and an "AI patch kit" first, an in-editor chat tab possibly later. Brainstorm only, nothing scheduled | Owner brainstorm. See Critical Discovery #226 |
 | 2026-10-15 | Public cut done and `v1.0.0` released: private repo frozen and renamed `x5dr-editor-private`; public `Baylo1/x5dr-editor` from one commit, now public; site live from the GitHub Release. Working copy moved outside iCloud (Landmine #95 retired) | Release Plan E1–E6 (#229–#232). No public rc (#228); E7 and the announcement still to come |
+| 2026-10-19 | Backups: the frozen private repo is kept as its bundle only (hardware-test Mac + iCloud Drive + GitHub); the public repo keeps a mirror plus release bundles. Bundles live in `~/Backups/`, never inside a mirror folder | A bundle holds the same history as a mirror and restores with `git clone` (restore test passed); the public mirror is the refresh source. Archive #234 |
 
 ---
 
@@ -5208,3 +5209,16 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Refresh:** at every release (E1 policy): `git -C ~/Backups/x5dr-editor.git fetch --prune`, a new `x5dr-editor-vX.Y.Z.bundle`, verify, copy to iCloud Drive.
 
 **Next:** E7 — fresh-machine / first-run pass.
+
+## Decision #234 — Backup Policy Amended: Private Repo Kept as a Bundle Only; Hardware-Test Mac Tidied
+
+**Context:** 2026-10-19, owner decision after E6 (#233). The E1 policy (#216) kept a mirror of each repo on the hardware-test Mac. A bundle holds the same history as a mirror (every branch, tag and commit) and `git clone` restores it, so for the frozen private repo the mirror only added the ability to browse without restoring.
+
+**Decision and changes (owner, on the hardware-test Mac):**
+- **Private repo:** mirror `~/Backups/x5dr-editor-private.git` deleted, after a restore test (`git clone` of `x5dr-editor-private-pre-public-cut.bundle` into a temporary folder) worked. Its copies are now the bundle (131 MB) in `~/Backups/` and in iCloud Drive, and GitHub (`x5dr-editor-private`).
+- **Public repo:** the mirror stays, because each refresh is a fetch in it followed by a new bundle. `x5dr-editor-v1.0.0.bundle` moved from inside the mirror folder (#233) to `~/Backups/`, so deleting or recreating the mirror can't take the bundle with it. With `git -C <mirror> bundle create`, a bare file name lands inside the mirror; the plan's commands now give the full path `~/Backups/<name>.bundle`.
+- **Deleted:** the old private-repo clone `x5dr-editor-OLD` (E2 said delete after E6), and the seven unzipped CI artifacts in `~/Development/X5DR Editor` (builds of private-repo branches from 2026-10-09/10, all merged into `v1.0.0`). The empty folder stays for future branch artifacts.
+
+**Docs:** Release Plan backup policy ("Three copies" amended), E2 (clone deleted), E6 and G4 bundle commands (full path), H1 (private repo: bundle only). Progress Log updated. #233's "the bundle sits inside the mirror folder" is superseded by this entry.
+
+**`~/Backups/` on the hardware-test Mac now:** `x5dr-editor-private-pre-public-cut.bundle`, `x5dr-editor-v1.0.0.bundle`, `x5dr-editor.git/`.

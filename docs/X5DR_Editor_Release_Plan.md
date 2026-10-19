@@ -447,7 +447,7 @@ Each branch also updates the rc.1 CHANGELOG entry and Getting Started where the 
   If any of them shows something, push it before the `pre-public-cut` tag. Don't turn this clone into the backup: it's a working copy with some branches only, and would need a GitHub login. The bundle mirror is the backup. The clone is retired in E2.
 
 **Backup policy (both repos, from E1 on).** GitHub is not the only copy.
-- **Three copies:** GitHub; a mirror on the hardware-test Mac, which is a different machine from the working copies on the development Mac; and one off-machine `git bundle` file (external drive, or iCloud Drive as a single file).
+- **Three copies:** GitHub; a copy on the hardware-test Mac, which is a different machine from the working copies on the development Mac; and one off-machine `git bundle` file (external drive, or iCloud Drive as a single file). *Amended 2026-10-19 (Archive #234):* on the hardware-test Mac the public repo keeps a mirror (`~/Backups/x5dr-editor.git`, the source for refreshes) plus its release bundles; the frozen private repo keeps only its bundle (its mirror was deleted after a restore test). Bundles live in `~/Backups/` itself, never inside a mirror folder.
 - **Never** put a backup inside the iCloud-synced project folder. Sync copies deletions, and many small git files trigger the Landmine #95 stall; a single bundle file is fine.
 - **Bundles** (`git bundle create <file> --all`) are single, self-checking files holding every branch and tag. `git bundle verify <file>` checks one; `git clone <file>` restores it anywhere.
 - **Private repo:** frozen after E1, so a one-time backup. Refresh it only if the private repo is ever changed again.
@@ -470,7 +470,7 @@ Each branch also updates the rc.1 CHANGELOG entry and Getting Started where the 
 - `gh repo rename x5dr-editor-private` (or Settings → Rename). It stays **private**.
 - In the old local folder: `git remote set-url origin git@github.com:Baylo1/x5dr-editor-private.git`.
 - Optional: Settings → Archive the repo (read-only) once E6 succeeds.
-- **Hardware-test Mac:** retire the old working clone before the rename. Delete the folder, or rename it (e.g. `x5dr-editor-OLD`) and delete it after E6. After E4 its `origin` would point at the new public repo, whose history is unrelated. If Live Server pointed at that folder, point it at the unzipped CI artifact folder instead. A fresh working clone, if wanted, comes after E5: `git clone https://github.com/Baylo1/x5dr-editor.git` (no login needed). Keep it separate from the `~/Backups/` mirror, which is never worked in.
+- **Hardware-test Mac:** retire the old working clone before the rename. Delete the folder, or rename it (e.g. `x5dr-editor-OLD`) and delete it after E6 *(deleted 2026-10-19, Archive #234)*. After E4 its `origin` would point at the new public repo, whose history is unrelated. If Live Server pointed at that folder, point it at the unzipped CI artifact folder instead. A fresh working clone, if wanted, comes after E5: `git clone https://github.com/Baylo1/x5dr-editor.git` (no login needed). Keep it separate from the `~/Backups/` mirror, which is never worked in.
 
 **Why.** Frees the `x5dr-editor` name, so the app's `REPO_URL`, `package.json` and the Pages URL are unchanged (D1, D6). Creating a new repo with the old name deliberately overrides GitHub's rename redirect.
 
@@ -576,7 +576,7 @@ Also run `npx gitleaks detect` (or `trufflehog filesystem .`) on the single comm
 
 **Backup (E1 policy).** First public-repo backup. The repo is public now, so the hardware-test Mac needs no login:
 - `git clone --mirror https://github.com/Baylo1/x5dr-editor.git ~/Backups/x5dr-editor.git`
-- `git -C ~/Backups/x5dr-editor.git bundle create x5dr-editor-v1.0.0.bundle --all`, then copy the bundle to the off-machine copy.
+- `git -C ~/Backups/x5dr-editor.git bundle create ~/Backups/x5dr-editor-v1.0.0.bundle --all` (a full path: with `-C`, a bare file name lands inside the mirror), then copy the bundle to the off-machine copy.
 
 **Decision.** Owner publishes the Release (CLAUDE.md: only the owner publishes Releases).
 
@@ -662,7 +662,7 @@ Draft the post text once, adapt per venue, and keep the drafts in `docs/` (publi
 - Label `needs-info` when waiting on a reporter, and close stale `needs-info` issues after about 30 days.
 - Device reports update the README "Supported devices" table.
 - **Weekly, with triage:** on the hardware-test Mac, `git -C ~/Backups/x5dr-editor.git remote update --prune`, plus the Issues export (E1 policy).
-- **At each release:** a new `x5dr-editor-vX.Y.Z.bundle` to the off-machine copy. Keep the last few, and always keep the bundles for `v1.0.0` and `pre-public-cut`.
+- **At each release:** refresh the mirror, then `git -C ~/Backups/x5dr-editor.git bundle create ~/Backups/x5dr-editor-vX.Y.Z.bundle --all`, `git bundle verify` it, and copy it to the off-machine copy. Keep the last few, and always keep the bundles for `v1.0.0` and `pre-public-cut`.
 
 **Why.** D14; backups per the E1 policy.
 
@@ -670,7 +670,7 @@ Draft the post text once, adapt per venue, and keep the drafts in `docs/` (publi
 
 ### H1. Housekeeping after 1.0.0
 
-- Archive the private repo read-only on GitHub. Its E1 bundle and the hardware-test Mac mirror stay the offline copies; check that `git bundle verify` still passes.
+- Archive the private repo read-only on GitHub. Its E1 bundle, on the hardware-test Mac and in iCloud Drive, stays the offline copy (no mirror since 2026-10-19, Archive #234); check that `git bundle verify` still passes.
 - Mark the task list's "PHASE 4" complete. Create a "v1.1" task-list group from H2.
 - Progress Log: Current Status → released; Next Actions → v1.1.
 - Retire Landmine #95 if the working copy moved out of iCloud (E4). *(Done 2026-10-15, Archive #230.)*
