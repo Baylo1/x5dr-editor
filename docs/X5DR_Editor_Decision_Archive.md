@@ -5272,3 +5272,13 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Verified in the browser (1440×900):** Multi Tracks scrolled to 620 → Control: Track 13's row top 727px on both; Multi Control at 300 → Effect → Tracks: Track 6 at 438px on both, scroll 300; Combi Timbres at 150 → Control: Timbre 7 at 636px on both. The paired grids' rows are equal height (Combi 721px, Multi 1417px tall, same top), which this relies on.
 
 **Next:** owner re-tests from the new `release/v1.0.1` CI artifact.
+
+## Decision #239 — All Notes Off Button Flashes When Sent; Table Scrolling Re-Test Passed
+
+**Context:** 2026-10-22. The owner's visual re-test of #238 (`release/v1.0.1` artifact `6c0a325`) passed: in-table scrolling and the shared Timbres/Tracks ↔ Control position work. The owner then asked for visible feedback when All Notes Off is clicked.
+
+**Change (`feature/all-notes-off`, merged into `release/v1.0.1`):** the button gets class `sent`, a 600ms `all-notes-off-flash` animation from the theme's accent fill (`--accent-fill`, text `--bg-page`) back to its normal colours; the class is removed on `animationend` and restarted (remove, reflow, add) on every click. Sending is unchanged: one `send()`, status-bar message.
+
+**Verified in the browser** (stand-in MIDI port): one send per click; frame 0 background = `--accent-fill` (rgb 255,171,74 in Warm Graphite), 300ms in = rgb 111,81,46, after the animation the normal rgb 44,39,33 with the class removed.
+
+**Next:** owner checks the flash from the new `release/v1.0.1` CI artifact; then merge, date the CHANGELOG, tag, release.

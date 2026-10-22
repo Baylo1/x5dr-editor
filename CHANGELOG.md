@@ -5,7 +5,7 @@ All notable changes to the Korg X5DR Editor are listed here. The format follows 
 ## [1.0.1] — Unreleased
 
 ### Added
-- **All Notes Off** button in the header: stops stuck notes on all 16 MIDI channels (it also releases the sustain pedal and cuts release tails).
+- **All Notes Off** button in the header: stops stuck notes on all 16 MIDI channels (it also releases the sustain pedal and cuts release tails), and flashes to confirm.
 - **Parametric EQ curve:** hold **Shift** while dragging a point to change just its frequency or just its gain, as on the envelopes.
 
 ### Changed
