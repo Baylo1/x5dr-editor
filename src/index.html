@@ -153,6 +153,11 @@
     }
     #all-notes-off-btn:hover:not(:disabled) { background: var(--hover-highlight); color: var(--text-primary); }
     #all-notes-off-btn:disabled { opacity: 0.5; cursor: default; }
+    /* Brief flash when sent: accent fill fading back to normal. */
+    #all-notes-off-btn.sent { animation: all-notes-off-flash 600ms ease-out; }
+    @keyframes all-notes-off-flash {
+      from { background: var(--accent-fill); color: var(--bg-page); border-color: var(--accent-fill); }
+    }
     /* ─── Device status pill: Disconnected / Connected / yellow No response or
        Rejected (colours not themed). Details are reported in #status-text. */
     #status-pill {
@@ -14181,11 +14186,17 @@ SOFTWARE.`;
   initChannelSelect();
   document.getElementById('channel-select').addEventListener('change', onChannelSelected);
   // On all 16 channels, not just the selected one (buildAllNotesOff, Landmine #129).
-  document.getElementById('all-notes-off-btn').addEventListener('click', () => {
+  document.getElementById('all-notes-off-btn').addEventListener('click', (e) => {
     if (!selectedOutput) return;
     selectedOutput.send(buildAllNotesOff());
     setStatus('All Notes Off sent on all 16 MIDI channels.');
+    // Restart the flash on every click (remove, reflow, re-add).
+    const btn = e.currentTarget;
+    btn.classList.remove('sent');
+    void btn.offsetWidth;
+    btn.classList.add('sent');
   });
+  document.getElementById('all-notes-off-btn').addEventListener('animationend', (e) => e.currentTarget.classList.remove('sent'));
 
   // Render PROG once at startup so its no-data placeholder shows.
   renderProgPanel();
