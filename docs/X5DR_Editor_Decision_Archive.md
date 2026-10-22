@@ -5248,3 +5248,17 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Version:** `package.json`, `package-lock.json`, `APP_VERSION` = 1.0.1; CHANGELOG `[1.0.1] — Unreleased`. Tests: 16 files, 515 tests; build OK; built file checked on port 5520 (About shows 1.0.1, no console errors).
 
 **Next:** owner hardware test of the `release/v1.0.1` CI artifact (All Notes Off with a held note, including one held by sustain, in Program, Combi and Multi mode; EQ Shift-drag heard on the device), then merge, date the CHANGELOG, tag and release (and the backup refresh), then G2.
+
+## Decision #237 — v1.0.1 Hardware Test; Combi/Multi Rows Now Scroll Inside the Table
+
+**Context:** 2026-10-22, owner's hardware test of the `release/v1.0.1` CI artifact (`x5dr-editor-release-v1.0.1-9ede653`) on the X5DR.
+
+**Results:** All Notes Off — works as expected. Parametric EQ Shift-drag — works as expected. Sticky headings — worked, but the owner wanted the table's top to stay put: the page still scrolled until the heading row met the title bar, losing the gap above the table and, on Multi, the Copy From Combination… button. Rows must not show in any gap above the heading row.
+
+**Change (`feature/sticky-grid-headers`, `f705081`, merged into `release/v1.0.1`):** the grid itself became the scroll box (Landmine #130, rewritten). `#content` no longer scrolls on these tabs while there is room for at least 240px of grid; the headings stick to the grid's top, and rows are clipped at the grid's edge, so they can't show above the headings. #236's `--combi-header-h`/`trackStickyHeaderHeight` approach is gone.
+
+**Found while doing it:** picking a timbre's or track's Program (and Initialize, Discard, a dump, Copy From Combination) re-renders the whole panel. With the page scrolling this kept its position; a new grid would start at the top, so each grid's scroll position is remembered and restored.
+
+**Verified in the browser (1440×900 and 1440×620):** `#content` has no overflow on Combi Timbres/Control and Multi Tracks/Control; grid `max-height` 569px (Combi) / 530px (Multi, below the Copy From Combination… button) and 250px at 620px tall, refitted on resize; headings' top = grid top when scrolled; a 15px classic scrollbar (simulated with `::-webkit-scrollbar`) gave `margin-right: -15px`, unchanged `gridTemplateColumns`, scrollbar inside the panel padding; Multi Tracks scrolled to 600px kept 600px after picking track 14's Program. Not checked on Windows itself.
+
+**Next:** owner re-tests item 3 from the new `release/v1.0.1` CI artifact; then merge, date the CHANGELOG, tag, release.

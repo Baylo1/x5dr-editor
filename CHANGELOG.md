@@ -9,7 +9,7 @@ All notable changes to the Korg X5DR Editor are listed here. The format follows 
 - **Parametric EQ curve:** hold **Shift** while dragging a point to change just its frequency or just its gain, as on the envelopes.
 
 ### Changed
-- **Combination and Multi** Timbres, Tracks and Control pages: the column headings stay in view while you scroll the list.
+- **Combination and Multi** Timbres, Tracks and Control pages: the list scrolls inside its table, so the column headings and everything above them stay in view.
 
 ## [1.0.0] — 2026-10-15
 
