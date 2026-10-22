@@ -10,8 +10,9 @@
 // What the shots show: Factory Bank A loaded, slot A00, Warm Graphite. There
 // is no X5DR attached, so a stand-in MIDI port ("USB MIDI Interface") ACKs
 // every SysEx message and the header shows a connected session; everything
-// else is the real app. Each shot grows the window until #content no longer
-// scrolls, then crops to #app-shell plus MARGIN, captured at 2x and scaled to
+// else is the real app. Each shot grows the window until neither #content nor
+// a visible Combi/Multi grid (its own scroll box, Landmine #130) scrolls, then
+// crops to #app-shell plus MARGIN, captured at 2x and scaled to
 // OUT_WIDTH with macOS `sips` when available.
 import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -107,13 +108,15 @@ async function main() {
     };
     const W = 'await new Promise(r => setTimeout(r, 400));';
 
-    // Grow the window until #content no longer scrolls, then crop to the app shell.
+    // Grow the window until nothing scrolls (#content or a visible grid), then crop to the app shell.
     const shot = async (name) => {
       let height = 900;
       for (let i = 0; i < 10; i++) {
         await s('Emulation.setDeviceMetricsOverride', { width: WIDTH, height, deviceScaleFactor: 2, mobile: false });
         await sleep(400);
-        const over = await js(`const c = document.getElementById('content'); return c.scrollHeight - c.clientHeight;`);
+        const over = await js(`const c = document.getElementById('content');
+          const grids = [...document.querySelectorAll('.combi-full-grid')].filter(g => g.offsetParent);
+          return Math.max(c.scrollHeight - c.clientHeight, ...grids.map(g => g.scrollHeight - g.clientHeight));`);
         if (over <= 0) break;
         height += over + 4;
       }

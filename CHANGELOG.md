@@ -2,7 +2,7 @@
 
 All notable changes to the Korg X5DR Editor are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
-## [1.0.1] — Unreleased
+## [1.0.1] — 2026-10-22
 
 ### Added
 - **All Notes Off** button in the header: stops stuck notes on all 16 MIDI channels (it also releases the sustain pedal and cuts release tails), and flashes to confirm.
