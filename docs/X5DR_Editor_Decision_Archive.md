@@ -5282,3 +5282,15 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Verified in the browser** (stand-in MIDI port): one send per click; frame 0 background = `--accent-fill` (rgb 255,171,74 in Warm Graphite), 300ms in = rgb 111,81,46, after the animation the normal rgb 44,39,33 with the class removed.
 
 **Next:** owner checks the flash from the new `release/v1.0.1` CI artifact; then merge, date the CHANGELOG, tag, release.
+
+## Decision #240 — v1.0.1 Released
+
+**Context:** 2026-10-22. The owner's check of the All Notes Off flash (#239) passed; the owner asked Claude to bring the docs up to date, merge to `main`, tag and publish (the owner's instruction in this session; CLAUDE.md otherwise reserves publishing for the owner).
+
+**Docs before the merge (`e734710`):** README Features gain All Notes Off and the EQ Shift-drag; Setup gains the stuck-note tip; both README screenshots regenerated (`npm run screenshots`; the header now shows All Notes Off). `scripts/screenshots.mjs` grew the window only until `#content` stopped scrolling, which since #237 would have cropped the Combi timbre list (the grid scrolls, not the page); it now also waits for every visible `.combi-full-grid` to stop scrolling. Landmine #116 points to its #129 exception. CHANGELOG `[1.0.1]` dated 2026-10-22. Project Context and the Release Plan needed no change.
+
+**Release:** `release/v1.0.1` merged to `main` with `--no-ff` (`1426ea1`); CI green on `main` (16 files, 515 tests, build). Annotated tag `v1.0.1` ("X5DR Editor v1.0.1"); Release "X5DR Editor v1.0.1" published from it with the CHANGELOG section as notes (not a pre-release, marked latest). `deploy.yml` green in 41s; `index.html` (1,023,985 bytes) attached. Live site checked: About shows "version 1.0.1" with no pre-release line, the All Notes Off button is present, `manifest.json` returns 200.
+
+**Branches:** `feature/all-notes-off`, `feature/eq-axis-lock`, `feature/sticky-grid-headers` and `release/v1.0.1` are merged and stay on the remote.
+
+**Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release": refresh the mirror, `x5dr-editor-v1.0.1.bundle`, verify, copy to iCloud Drive). Then G2 demo video, G3 announcement.
