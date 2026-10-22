@@ -902,9 +902,14 @@
     /* Multi CONTROL: adds Bend Range after Level (one more column + spacer).
        Adding columns can overflow the row — measure it (Landmine #99). */
     .multi-full-grid-control { grid-template-columns: max-content max-content max-content max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content; }
-    /* Column headings (the 1fr spacers' headings are empty cells) stick just
-       under the sticky .combi-header, whose height trackStickyHeaderHeight()
-       keeps in --combi-header-h; rows scroll behind them (Landmine #130). */
+    /* The grid is its own scroll box, sized by fitFullGridsToContent() to end
+       at the bottom of #content, so the page above it stays put; the column
+       headings (the 1fr spacers' headings are empty cells) stick to its top
+       and the rows scroll behind them, clipped at its edge (Landmine #130). */
+    .combi-full-grid {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     .combi-full-colhdr {
       font-size: 0.6875rem;
       color: var(--text-secondary);
@@ -916,8 +921,8 @@
       align-self: stretch;
       justify-self: stretch;
       position: sticky;
-      top: var(--combi-header-h, 0px);
-      /* Below .combi-header (10), above the rows. */
+      top: 0;
+      /* Above the rows. */
       z-index: 5;
     }
     /* Backing for the stuck row: spans half the column gap on each side (none
@@ -10576,7 +10581,6 @@
     // Sticky header: combi name + inner tab bar + action bar on one line
     const combiHeader = document.createElement('div');
     combiHeader.className = 'combi-header';
-    trackStickyHeaderHeight(panelEl, combiHeader);
 
     const nameEl = document.createElement('div');
     nameEl.id = 'combi-name';
@@ -10868,22 +10872,44 @@
     return knob;
   }
 
-  // Keeps --combi-header-h on the panel equal to its sticky .combi-header's
-  // height, so the grids' column headings stick right under it (Landmine #130).
-  // One observed header per panel; a re-render swaps in the new one.
-  const stickyHeaderObserver = new ResizeObserver(entries => {
-    // Fractional height: a rounded one leaves a sub-pixel seam rows show through.
-    for (const { target } of entries) {
-      target.parentElement?.style.setProperty('--combi-header-h', `${target.getBoundingClientRect().height}px`);
-    }
-  });
-  const stickyHeaderByPanel = new Map();
-  function trackStickyHeaderHeight(panelEl, header) {
-    const old = stickyHeaderByPanel.get(panelEl);
-    if (old) stickyHeaderObserver.unobserve(old);
-    stickyHeaderByPanel.set(panelEl, header);
-    stickyHeaderObserver.observe(header);
+  // Each visible grid gets a max-height that ends it (plus its panel's bottom
+  // padding) at the bottom of #content, so #content doesn't scroll and the
+  // rows scroll inside the grid (Landmine #130). Refits when #content resizes
+  // (window) and when a grid appears, is shown or changes size; a grid's own
+  // scrollbar moves into the panel's right padding so the columns keep their
+  // width. Below FULL_GRID_MIN_HEIGHT_PX the page scrolls as before.
+  // A re-render (e.g. after picking a timbre's Program) builds a new grid, so
+  // each grid's scroll position is kept by panel + grid class and restored
+  // once the new grid has its max-height.
+  const FULL_GRID_MIN_HEIGHT_PX = 240;
+  const fullGridScrollTops = new Map();
+  const fullGridScrollKey = (grid) => `${grid.closest('.panel')?.id} ${grid.className}`;
+  function fitFullGridsToContent() {
+    const content = document.getElementById('content');
+    const contentRect = content.getBoundingClientRect();
+    const contentPadBottom = parseFloat(getComputedStyle(content).paddingBottom) || 0;
+    document.querySelectorAll('.combi-full-grid').forEach((grid) => {
+      if (!grid.offsetParent) return; // hidden tab
+      const panelPadBottom = parseFloat(getComputedStyle(grid.parentElement).paddingBottom) || 0;
+      const gridTopInContent = grid.getBoundingClientRect().top - contentRect.top + content.scrollTop;
+      const avail = content.clientHeight - contentPadBottom - panelPadBottom - gridTopInContent;
+      const maxHeight = `${Math.max(FULL_GRID_MIN_HEIGHT_PX, Math.floor(avail))}px`;
+      if (grid.style.maxHeight !== maxHeight) grid.style.maxHeight = maxHeight;
+      const scrollbarW = grid.offsetWidth - grid.clientWidth;
+      const marginRight = scrollbarW > 0 ? `-${scrollbarW}px` : '';
+      if (grid.style.marginRight !== marginRight) grid.style.marginRight = marginRight;
+      if (!grid._scrollRestored) {
+        grid._scrollRestored = true;
+        grid.scrollTop = fullGridScrollTops.get(fullGridScrollKey(grid)) ?? 0;
+      }
+    });
   }
+  const fullGridObserver = new ResizeObserver((entries) => {
+    // A removed grid reports size 0: stop observing it.
+    for (const { target } of entries) if (!target.isConnected) fullGridObserver.unobserve(target);
+    fitFullGridsToContent();
+  });
+  fullGridObserver.observe(document.getElementById('content'));
 
   function buildCombiFullGridShell(extraClass) {
     const panel = document.createElement('div');
@@ -10891,6 +10917,10 @@
     const grid = document.createElement('div');
     grid.className = `combi-full-grid ${extraClass}`;
     panel.appendChild(grid);
+    fullGridObserver.observe(grid);
+    grid.addEventListener('scroll', () => {
+      if (grid._scrollRestored) fullGridScrollTops.set(fullGridScrollKey(grid), grid.scrollTop);
+    });
     return { panel, grid };
   }
   function fullHdr(grid, text) {
@@ -11365,7 +11395,6 @@
 
     const header = document.createElement('div');
     header.className = 'combi-header'; // reuse Combi's sticky-header styling — no name/actions content of its own
-    trackStickyHeaderHeight(panelEl, header);
     const title = document.createElement('div');
     title.id = 'multi-title';
     title.textContent = 'MULTI EDIT';
