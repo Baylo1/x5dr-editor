@@ -10878,18 +10878,20 @@
   // (window) and when a grid appears, is shown or changes size; a grid's own
   // scrollbar moves into the panel's right padding so the columns keep their
   // width. Below FULL_GRID_MIN_HEIGHT_PX the page scrolls as before.
-  // A re-render (e.g. after picking a timbre's Program) builds a new grid, so
-  // each grid's scroll position is kept by panel + grid class and restored
-  // once the new grid has its max-height.
+  // One scroll position per panel, shared by its grids: switching Timbres <->
+  // Control (Tracks <-> Control) keeps the same row at the same place on
+  // screen, as the page scroll did (the grids' rows are the same height). A
+  // grid takes it each time it is shown, including a re-render's new grid
+  // (e.g. after picking a timbre's Program), once it has its max-height.
   const FULL_GRID_MIN_HEIGHT_PX = 240;
   const fullGridScrollTops = new Map();
-  const fullGridScrollKey = (grid) => `${grid.closest('.panel')?.id} ${grid.className}`;
+  const fullGridScrollKey = (grid) => grid.closest('.panel')?.id;
   function fitFullGridsToContent() {
     const content = document.getElementById('content');
     const contentRect = content.getBoundingClientRect();
     const contentPadBottom = parseFloat(getComputedStyle(content).paddingBottom) || 0;
     document.querySelectorAll('.combi-full-grid').forEach((grid) => {
-      if (!grid.offsetParent) return; // hidden tab
+      if (!grid.offsetParent) { grid._shown = false; return; } // hidden tab
       const panelPadBottom = parseFloat(getComputedStyle(grid.parentElement).paddingBottom) || 0;
       const gridTopInContent = grid.getBoundingClientRect().top - contentRect.top + content.scrollTop;
       const avail = content.clientHeight - contentPadBottom - panelPadBottom - gridTopInContent;
@@ -10898,8 +10900,8 @@
       const scrollbarW = grid.offsetWidth - grid.clientWidth;
       const marginRight = scrollbarW > 0 ? `-${scrollbarW}px` : '';
       if (grid.style.marginRight !== marginRight) grid.style.marginRight = marginRight;
-      if (!grid._scrollRestored) {
-        grid._scrollRestored = true;
+      if (!grid._shown) {
+        grid._shown = true;
         grid.scrollTop = fullGridScrollTops.get(fullGridScrollKey(grid)) ?? 0;
       }
     });
@@ -10919,7 +10921,8 @@
     panel.appendChild(grid);
     fullGridObserver.observe(grid);
     grid.addEventListener('scroll', () => {
-      if (grid._scrollRestored) fullGridScrollTops.set(fullGridScrollKey(grid), grid.scrollTop);
+      // Not while hidden: a hidden grid reads 0.
+      if (grid._shown && grid.offsetParent) fullGridScrollTops.set(fullGridScrollKey(grid), grid.scrollTop);
     });
     return { panel, grid };
   }
