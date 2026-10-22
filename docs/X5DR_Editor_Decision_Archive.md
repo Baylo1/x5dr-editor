@@ -5262,3 +5262,13 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Verified in the browser (1440×900 and 1440×620):** `#content` has no overflow on Combi Timbres/Control and Multi Tracks/Control; grid `max-height` 569px (Combi) / 530px (Multi, below the Copy From Combination… button) and 250px at 620px tall, refitted on resize; headings' top = grid top when scrolled; a 15px classic scrollbar (simulated with `::-webkit-scrollbar`) gave `margin-right: -15px`, unchanged `gridTemplateColumns`, scrollbar inside the panel padding; Multi Tracks scrolled to 600px kept 600px after picking track 14's Program. Not checked on Windows itself.
 
 **Next:** owner re-tests item 3 from the new `release/v1.0.1` CI artifact; then merge, date the CHANGELOG, tag, release.
+
+## Decision #238 — Combi/Multi Tables Share One Scroll Position per Panel
+
+**Context:** 2026-10-22, owner's visual test of #237's in-table scrolling (`release/v1.0.1` artifact `d1c65a7`): it works, but loses a behaviour the page scroll gave for free. Scrolled to Multi Track 13 on Tracks, switching to Control showed Track 13's controls at exactly the same place on screen; with a scroll box per grid, the other tab started at the top.
+
+**Change (`feature/sticky-grid-headers`, merged into `release/v1.0.1`):** `fullGridScrollTops` is keyed by panel id only, so a panel's grids share one position; `fitFullGridsToContent()` applies it each time a grid goes from hidden to shown (`grid._shown`), not just once. Scroll events from a hidden grid are ignored: the browser delivers a scroll event a frame late, and a grid hidden in the meantime reads 0 (found when a test scrolled and switched tab in the same task). Landmine #130 updated.
+
+**Verified in the browser (1440×900):** Multi Tracks scrolled to 620 → Control: Track 13's row top 727px on both; Multi Control at 300 → Effect → Tracks: Track 6 at 438px on both, scroll 300; Combi Timbres at 150 → Control: Timbre 7 at 636px on both. The paired grids' rows are equal height (Combi 721px, Multi 1417px tall, same top), which this relies on.
+
+**Next:** owner re-tests from the new `release/v1.0.1` CI artifact.

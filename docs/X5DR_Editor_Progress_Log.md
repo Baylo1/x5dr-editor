@@ -19,7 +19,7 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 - **Phase 4** (`X5DR_Editor_Release_Plan.md`, #199; no public rc, #228):
   - **Stages A–D done** (#200–#227): single-file build (Landmine #123), `file://` (Landmine #103), CI, icons/manifest, Help text, README/CHANGELOG, doc scrub, §10 allowlist; D1 hardware regression and fixes (#217–#219); D2 Edge/Mac and Windows 11 (#220, #227); D3 wording (#221); X5D/X5DR-only sounds (#222, Landmine #127); D4 RC feedback (#223, Landmines #68, #107, #128); VDF/VDA column titles (#224).
   - **Stage E done** (#229–#235): private repo frozen at `pre-public-cut` and renamed `x5dr-editor-private` (kept as its bundle, #234); noreply email; public repo from the single commit `ffe1ec8` (94 files), flipped public, `v*` tag rule on `github-pages`; `v1.0.0` published by the owner, deploy green; public repo backed up (mirror + bundle in the hardware-test Mac's `~/Backups/`, bundle in iCloud Drive). E7 first-run pass on a Mac (Chrome incognito, Edge with no profile; Pages and `file://`, incl. install as app): all passed, no friction, no `v1.0.1`. Working copy `~/Developer/x5dr-editor`; the Desktop folder is the frozen private archive (don't edit it).
-- **v1.0.1 in progress** (#236): All Notes Off header button, Shift-drag on the Parametric EQ curve, sticky Combi/Multi column headings. Branch `release/v1.0.1` (combines three feature branches, version bumped). Hardware test: items 1–2 passed; item 3 reworked so rows scroll inside the table (#237), awaiting re-test.
+- **v1.0.1 in progress** (#236): All Notes Off header button, Shift-drag on the Parametric EQ curve, sticky Combi/Multi column headings. Branch `release/v1.0.1` (combines three feature branches, version bumped). Hardware test: items 1–2 passed; item 3 reworked so rows scroll inside the table (#237), sharing one scroll position between a panel's tabs (#238); awaiting re-test.
 - **Testing:** CI on `main` passes (16 test files, 510 tests, build); `release/v1.0.1`: 16 files, 515 tests. Report the file count, not just the pass count (Landmine #80); with subagent worktrees present use `--exclude '.claude/**'` (Landmine #125).
 
 ---
@@ -71,4 +71,4 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 
 ---
 
-*Last updated: 2026-10-22 — v1.0.1 on `release/v1.0.1` (#236–#237): two items passed on hardware, table scrolling reworked, awaiting re-test. Then G2 demo video, G3 announce.*
+*Last updated: 2026-10-22 — v1.0.1 on `release/v1.0.1` (#236–#238): two items passed on hardware, table scrolling reworked, awaiting re-test. Then G2 demo video, G3 announce.*
