@@ -1,6 +1,6 @@
 {
   "name": "x5dr-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Browser-based real-time editor and librarian for the Korg X5DR synthesizer, over Web MIDI SysEx.",
   "author": "Mark Baylis",

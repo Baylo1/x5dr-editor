@@ -15,12 +15,12 @@
 
 | # | Topic | Landmines |
 |---|---|---|
-| 1 | Device modes, ACK/NAK, timeouts, MIDI channel | 1, 2, 3, 4, 6, 7, 18, 19, 21, 24, 38, 41, 43, 48, 54, 57, 60, 62, 104, 112, 114, 115, 116, 118, 119, 120, 121, 126 |
+| 1 | Device modes, ACK/NAK, timeouts, MIDI channel | 1, 2, 3, 4, 6, 7, 18, 19, 21, 24, 38, 41, 43, 48, 54, 57, 60, 62, 104, 112, 114, 115, 116, 118, 119, 120, 121, 126, 129 |
 | 2 | Wire formats, dump layout, packing, encodings | 5, 10, 12, 13, 14, 17, 20, 22, 23, 25, 35, 42, 44, 45, 47, 53, 55, 56, 111, 122 |
 | 3 | Effects (layout, Balance, MG Status) | 9, 11, 16, 52, 89, 90, 93, 94, 108, 109 |
 | 4 | Store, dirty state, write/discard | 26, 27, 32, 36, 37, 51, 59, 61, 110, 113 |
 | 5 | Program / Combi / Multi / Global / Drums specifics | 33, 39, 40, 46, 49, 50, 58, 63, 64, 65, 75, 76, 88, 102 |
-| 6 | UI components and CSS layout | 15, 28, 29, 30, 31, 34, 66, 67, 68, 70, 71, 72, 73, 74, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 91, 92, 96, 97, 98, 99, 100, 101, 105, 106, 107, 117, 124, 127, 128 |
+| 6 | UI components and CSS layout | 15, 28, 29, 30, 31, 34, 66, 67, 68, 70, 71, 72, 73, 74, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 91, 92, 96, 97, 98, 99, 100, 101, 105, 106, 107, 117, 124, 127, 128, 130 |
 | 7 | Tooling (routing, dev server, tests, git, build) | 8, 69, 80, 95, 103, 123, 125 |
 
 ---
@@ -82,6 +82,8 @@
 **121. The header pill shows device health and is set only through `setDeviceHealth(state)`** (`disconnected`/`connected`/`no-response`/`rejected`). The amber states come only from awaited exchanges (`armAckReply`/`armWriteReply` timeouts and NAKs, the dump-request watchdog) and from NAK/format-error replies, never from a live-edit path (#115). Any answer from the device clears them. `setSelectedOutput` resets them only on a real port change, because port-list rebuilds fire on hot-plug and implicit open (#118). `CODE` *(Archive #196)*
 
 **126. A NAK can answer a dump request, not just a Parameter Change.** Single Program (Func=`10`) is answered only in Program/Prog Edit and Single Combination (Func=`19`) only in Combination/Combi Edit; in another mode the device sends `24` (a power cycle can leave it elsewhere). `handleSysexMessage` routes a NAK that arrives while `awaitingDump` to `refuseDumpRequest()` (ends the request, its own box) and ignores further NAKs for `DUMP_NAK_IGNORE_MS` (500, Chrome repeats them, #7); it must never reach the Parameter Change recovery (#4). `HW` *(Archive #217, #218)*
+
+**129. All Notes Off is the one deliberate exception to #116: `buildAllNotesOff()` (`sysex.js`) sends on all 16 channels, not `getSysexChannel()`.** Combi timbres and Multi tracks each listen on their own channel, so the selected channel alone misses most of them. Per channel: CC 64 = 0, CC 120, CC 123, in one `send()`. CC 123 is always received; CC 64/120 only with the Control Filter enabled (Global, or a timbre/track's DM/CC filter), otherwise ignored. `MANUAL` *(Archive #236)*
 
 ---
 
@@ -289,6 +291,7 @@
 **128. Item grids are row-major, and their arrow keys go through `src/ui/gridNav.js`.** `buildSoundGridTable`, `buildPatchTable`, `buildKitSummaryTable` and the Drums tab slot grid place item `i` at row `floor(i / cols)`, column `i % cols` — never `c * rows + r` (a scrolled 430-item column order looked like missing numbers). Keyboard moves use `gridArrowTarget` (`gridArrowTargetSkipping` for disabled cells): Left/Right ±1 wrapping rows; Up/Down ±cols, continuing at the top/bottom of the adjacent column; `null` at the ends. A new grid reuses it rather than hand-rolling deltas. `CODE` *(Archive #223)*
 
 **124. An inline SVG that defines an `id` (a `<marker>`, gradient, clipPath) and references it with `url(#id)` must get a unique id per copy.** `url(#id)` resolves to the *first* element with that id in the whole page, and a marker inside a hidden (`display: none`) tab draws nothing — so PROG, COMBI and MULTI showing the same placement diagram left the later copies without arrows. `buildPlacementDiagram` suffixes every `arrow-eff-*` id with a per-call counter; any new id-bearing SVG template needs the same. `CODE` *(Archive #201)*
+**130. Combi/Multi grid column headings are sticky grid items, offset by `--combi-header-h`.** `trackStickyHeaderHeight(panelEl, header)` (a `ResizeObserver`, fractional height: a rounded one leaves a seam) keeps it equal to the panel's sticky `.combi-header`; z-index 5, below the header's 10. The 1fr spacers' headings are empty `fullHdr(grid, '')` cells (not `fullSpacer`) so the backing is continuous; each heading's `::before` covers half the column gap (1.75rem) each side, none past the grid's outer edges, and redraws the rule 1px below the row, exactly over the first `.combi-full-sep`. A new grid on these tabs needs the same; changing the column gap means changing the `::before` insets. `CODE` *(Archive #236)*
 ---
 
 ## 7. Tooling
