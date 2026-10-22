@@ -138,6 +138,21 @@
       flex: 0 0 auto;
       padding: 0.375rem 2.25rem 0.375rem 0.75rem;
     }
+    /* All Notes Off: a pill like the selectors beside it, without the chevron. */
+    #all-notes-off-btn {
+      font-family: var(--font-ui);
+      font-size: 0.6875rem;
+      background: var(--bg-button-neutral);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 0.375rem 0.875rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    #all-notes-off-btn:hover:not(:disabled) { background: var(--hover-highlight); color: var(--text-primary); }
+    #all-notes-off-btn:disabled { opacity: 0.5; cursor: default; }
     /* ─── Device status pill: Disconnected / Connected / yellow No response or
        Rejected (colours not themed). Details are reported in #status-text. */
     #status-pill {
@@ -3042,6 +3057,7 @@
     <select id="channel-select" title="MIDI channel — must match the device's Global MIDI Channel">
       <!-- options 1-16 populated by initChannelSelect() -->
     </select>
+    <button id="all-notes-off-btn" disabled title="Stop any stuck notes: sends Damper Off, All Sound Off and All Notes Off on all 16 MIDI channels">All Notes Off</button>
     <div id="status-pill" class="disconnected" title="No MIDI output selected">Disconnected</div>
   </div>
 
@@ -3328,6 +3344,7 @@
     buildGlobalDump,
     buildDrumsDump,
     DUMP_REPLY_BYTES,
+    buildAllNotesOff,
   } from './midi/sysex.js';
   import { parseSnapshot } from './midi/parser.js';
   import { checkLoadFile, checkDataFile, DATA_TYPES, DATA_TYPE_LABELS, dataFileSaveName, dataFileSaveKind } from './midi/loadFileCheck.js';
@@ -12770,7 +12787,7 @@ SOFTWARE.`;
     <h4>Compatible models</h4>
     <p>Built and tested on the <strong>X5DR</strong>. The <strong>X5D</strong> should also work. The <strong>X5</strong> and <strong>05R/W</strong> should be largely compatible but have fewer multisounds and drums, so some sounds and settings may not carry over. The X5, X5D and 05R/W are currently <strong>untested</strong>. If you own one, please tell us how it went (<strong>Help → Report a Problem</strong> → Device report).</p>
     <h4>Auditioning sounds</h4>
-    <p>Apart from a short audition note in the Drum Sound Browser, the editor does not send note or controller data, nor does it accept input from a controller keyboard. Module users (X5DR, 05R/W) will need a DAW or another app to send MIDI note and controller data to the device. X5 and X5D owners can use the built-in keyboard.</p>
+    <p>Apart from a short audition note in the Drum Sound Browser and the <strong>All Notes Off</strong> button, the editor does not send note or controller data, nor does it accept input from a controller keyboard. Module users (X5DR, 05R/W) will need a DAW or another app to send MIDI note and controller data to the device. X5 and X5D owners can use the built-in keyboard.</p>
     <h4>How editing works</h4>
     <ul>
       <li>Program and Combination edits are sent to the device as you move controls. Use <strong>Write In Place</strong> to store them, or its drop-down to <strong>Write To A New Slot…</strong>. <strong>Discard</strong> reverts unwritten edits.</li>
@@ -12812,6 +12829,8 @@ SOFTWARE.`;
     <p>The file (when loading) or the editor (when saving) has no data for that type. Hover over it to see why. For example, a file saved as "All Data" without Multi track settings can't load Multi.</p>
     <h4>A write or import stalls</h4>
     <p>The editor waits for the device to acknowledge each transfer. If it times out, check the connection above and try again.</p>
+    <h4>A note keeps sounding</h4>
+    <p>Click <strong>All Notes Off</strong> in the header. It stops every note on all 16 MIDI channels, including notes held by a sustain pedal. If a note still sounds, the X5DR may be set to ignore controller messages (its Global MIDI filter, or the DM/CC filter on a Combination timbre or Multi track), so it misses the sustain-pedal release; stop the note from your DAW instead.</p>
     <h4>The X5DR stops answering everything</h4>
     <p>Several large imports in quick succession (All Data, All Programs, All Combinations) can leave the X5DR not answering any request until it is switched off and on again. Leave a few seconds between large imports.</p>
     <h4>The interface doesn't come back after reconnecting it</h4>
@@ -14044,6 +14063,7 @@ SOFTWARE.`;
       pendingParam = null;
     }
     selectedOutput = port;
+    document.getElementById('all-notes-off-btn').disabled = !port;
     // A new port starts clean (Disconnected without one); a rebuild keeps the state.
     if (changed || !port) setDeviceHealth('connected');
     midiAccess.inputs.forEach(input => {
@@ -14160,6 +14180,12 @@ SOFTWARE.`;
   document.getElementById('port-select').addEventListener('change', onPortSelected);
   initChannelSelect();
   document.getElementById('channel-select').addEventListener('change', onChannelSelected);
+  // On all 16 channels, not just the selected one (buildAllNotesOff, Landmine #129).
+  document.getElementById('all-notes-off-btn').addEventListener('click', () => {
+    if (!selectedOutput) return;
+    selectedOutput.send(buildAllNotesOff());
+    setStatus('All Notes Off sent on all 16 MIDI channels.');
+  });
 
   // Render PROG once at startup so its no-data placeholder shows.
   renderProgPanel();

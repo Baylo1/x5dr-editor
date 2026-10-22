@@ -6,7 +6,7 @@ import {
   buildModeChange, buildParamChange, buildDrumParamChange, buildDumpRequest,
   buildProgramWriteRequest, buildCombiWriteRequest, buildSingleProgramDump, buildSingleCombiDump,
   buildMultiEffectsDump, buildMultiExpansionDump, buildGlobalDump, buildDrumsDump,
-  isAck, isNak, isFormatError, isWriteCompleted, isWriteError,
+  isAck, isNak, isFormatError, isWriteCompleted, isWriteError, buildAllNotesOff,
 } from './sysex.js';
 import { parseSnapshot } from './parser.js';
 import { snapshotToSyx, programsToSyx, combisToSyx } from './encoder.js';
@@ -106,5 +106,21 @@ describe('response checkers accept any channel', () => {
     expect(isAck(new Uint8Array([0xF0, 0x42, 0x30, 0x35, 0x23, 0xF7]))).toBe(false);
     expect(isAck(new Uint8Array([0xF0, 0x42, 0x40, 0x36, 0x23, 0xF7]))).toBe(false);
     expect(isAck(new Uint8Array([0xF0, 0x42, 0x30, 0x36, 0x24, 0xF7]))).toBe(false);
+  });
+});
+
+describe('buildAllNotesOff', () => {
+  it('sends Damper Off, All Sound Off and All Notes Off on all 16 channels', () => {
+    const msg = [...buildAllNotesOff()];
+    expect(msg.length).toBe(16 * 9);
+    for (let ch = 0; ch < 16; ch++) {
+      expect(msg.slice(ch * 9, ch * 9 + 9)).toEqual([0xB0 | ch, 64, 0, 0xB0 | ch, 120, 0, 0xB0 | ch, 123, 0]);
+    }
+  });
+
+  it('ignores the selected channel — Combi/Multi parts listen on their own channels', () => {
+    const onCh1 = [...buildAllNotesOff()];
+    setSysexChannel(9);
+    expect([...buildAllNotesOff()]).toEqual(onCh1);
   });
 });

@@ -593,3 +593,19 @@ export function buildDrumsDump(kits) {
   const trimmed = packed.slice(0, packedLength(raw.length));
   return new Uint8Array([...sysexHeader(), 0x52, 0x00, ...trimmed, 0xF7]);
 }
+
+/**
+ * "Panic" for the header's All Notes Off button: on every channel 1-16, Damper
+ * Off (CC 64 = 0), All Sound Off (CC 120) and All Notes Off (CC 123). All 16,
+ * not the selected channel: Combi timbres and Multi tracks each listen on their
+ * own channel. CC 123 is always received; CC 64 and 120 only with Global's
+ * Control Filter enabled (01_channel_messages.md §2-1) — ignored otherwise.
+ * One flat array of 3-byte messages, ready for a single send().
+ */
+export function buildAllNotesOff() {
+  const bytes = [];
+  for (let ch = 0; ch < 16; ch++) {
+    bytes.push(0xB0 | ch, 64, 0, 0xB0 | ch, 120, 0, 0xB0 | ch, 123, 0);
+  }
+  return new Uint8Array(bytes);
+}
