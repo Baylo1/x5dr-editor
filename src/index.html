@@ -138,6 +138,26 @@
       flex: 0 0 auto;
       padding: 0.375rem 2.25rem 0.375rem 0.75rem;
     }
+    /* All Notes Off: a pill like the selectors beside it, without the chevron. */
+    #all-notes-off-btn {
+      font-family: var(--font-ui);
+      font-size: 0.6875rem;
+      background: var(--bg-button-neutral);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 0.375rem 0.875rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    #all-notes-off-btn:hover:not(:disabled) { background: var(--hover-highlight); color: var(--text-primary); }
+    #all-notes-off-btn:disabled { opacity: 0.5; cursor: default; }
+    /* Brief flash when sent: accent fill fading back to normal. */
+    #all-notes-off-btn.sent { animation: all-notes-off-flash 600ms ease-out; }
+    @keyframes all-notes-off-flash {
+      from { background: var(--accent-fill); color: var(--bg-page); border-color: var(--accent-fill); }
+    }
     /* ─── Device status pill: Disconnected / Connected / yellow No response or
        Rejected (colours not themed). Details are reported in #status-text. */
     #status-pill {
@@ -887,6 +907,14 @@
     /* Multi CONTROL: adds Bend Range after Level (one more column + spacer).
        Adding columns can overflow the row — measure it (Landmine #99). */
     .multi-full-grid-control { grid-template-columns: max-content max-content max-content max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content; }
+    /* The grid is its own scroll box, sized by fitFullGridsToContent() to end
+       at the bottom of #content, so the page above it stays put; the column
+       headings (the 1fr spacers' headings are empty cells) stick to its top
+       and the rows scroll behind them, clipped at its edge (Landmine #130). */
+    .combi-full-grid {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     .combi-full-colhdr {
       font-size: 0.6875rem;
       color: var(--text-secondary);
@@ -895,8 +923,29 @@
       text-align: center;
       white-space: nowrap;
       padding-bottom: 0.75rem;
-      align-self: end;
+      align-self: stretch;
+      justify-self: stretch;
+      position: sticky;
+      top: 0;
+      /* Above the rows. */
+      z-index: 5;
     }
+    /* Backing for the stuck row: spans half the column gap on each side (none
+       past the grid's outer edges) and draws the heading rule exactly over the
+       first .combi-full-sep, so the unscrolled table looks as before. */
+    .combi-full-colhdr::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: -1px;
+      left: -0.875rem;
+      right: -0.875rem;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: -1;
+    }
+    .combi-full-colhdr:first-child::before { left: 0; }
+    .combi-full-colhdr:has(+ .combi-full-sep)::before { right: 0; }
     .combi-full-sep {
       grid-column: 1 / -1;
       border-bottom: 1px solid var(--border-subtle);
@@ -3042,6 +3091,7 @@
     <select id="channel-select" title="MIDI channel — must match the device's Global MIDI Channel">
       <!-- options 1-16 populated by initChannelSelect() -->
     </select>
+    <button id="all-notes-off-btn" disabled title="Stop any stuck notes: sends Damper Off, All Sound Off and All Notes Off on all 16 MIDI channels">All Notes Off</button>
     <div id="status-pill" class="disconnected" title="No MIDI output selected">Disconnected</div>
   </div>
 
@@ -3328,6 +3378,7 @@
     buildGlobalDump,
     buildDrumsDump,
     DUMP_REPLY_BYTES,
+    buildAllNotesOff,
   } from './midi/sysex.js';
   import { parseSnapshot } from './midi/parser.js';
   import { checkLoadFile, checkDataFile, DATA_TYPES, DATA_TYPE_LABELS, dataFileSaveName, dataFileSaveKind } from './midi/loadFileCheck.js';
@@ -3347,7 +3398,7 @@
     knobUnidirectional, knobBidirectional, threeWayToggle,
     dualHandleRangeSlider, egCurveWidget, toggleButtonGroup, checkboxCtrl,
     knobWithOverride, buildReadout, verticalFaderCentered, SMALL_KNOB_SIZE, DEFAULT_KNOB_SIZE,
-    HERO_KNOB_SIZE, HERO_VALUE_FONT_SIZE, beginPointerDrag, svgEl,
+    HERO_KNOB_SIZE, HERO_VALUE_FONT_SIZE, beginPointerDrag, svgEl, dragAxisLock,
   } from './ui/controls.js';
 
   // ─── Cross-tab shared parameters ─────────────────────────────────────────────
@@ -7898,28 +7949,40 @@
     }
     updateCurve();
 
+    // Per band: its eq keys, knobs and param offsets.
+    const EQ_BANDS = {
+      low:  { freqKey: 'lowFreq',  gainKey: 'lowGain',  freqKnob: regKnobs.lowFreq,  gainKnob: regKnobs.lowGain,  freqOffset: 0, gainOffset: 1, xToFreq: eqLowXToFreq },
+      mid:  { freqKey: 'midFreq',  gainKey: 'midGain',  freqKnob: midFreqKnob,       gainKnob: midGainKnob,       freqOffset: 2, gainOffset: 3, xToFreq: eqMidXToFreq },
+      high: { freqKey: 'highFreq', gainKey: 'highGain', freqKnob: regKnobs.highFreq, gainKnob: regKnobs.highGain, freqOffset: 5, gainOffset: 6, xToFreq: eqHighXToFreq },
+    };
+
     handles.forEach(({ band, hitEl }) => {
       hitEl.addEventListener('pointerdown', (e) => {
+        const b = EQ_BANDS[band];
+        const startClientX = e.clientX;
+        const startClientY = e.clientY;
+        const startFreq = eq[b.freqKey];
+        const startGain = eq[b.gainKey];
+        // Shift locks the drag to the axis moved first (x = Freq, y = Gain);
+        // the other value goes back to where it started, as on the EG curves.
+        let axis = null;
         const onMove = (ev) => {
+          axis = dragAxisLock(axis, ev.shiftKey, ev.clientX - startClientX, ev.clientY - startClientY);
           const rect = svg.getBoundingClientRect();
           const x = eqClamp((ev.clientX - rect.left) / rect.width * EQ_CURVE_W, 0, EQ_CURVE_W);
           const y = eqClamp((ev.clientY - rect.top) / rect.height * EQ_CURVE_H, 0, EQ_CURVE_H);
-          const gain = eqYToGain(y);
-          if (band === 'low') {
-            eq.lowFreq = eqLowXToFreq(x); eq.lowGain = gain;
-            regKnobs.lowFreq._setValue(eq.lowFreq);
-            regKnobs.lowGain._setValue(eq.lowGain);
-            handleChangeFor(0)(eq.lowFreq); handleChangeFor(1)(eq.lowGain);
-          } else if (band === 'mid') {
-            eq.midFreq = eqMidXToFreq(x); eq.midGain = gain;
-            midFreqKnob._setValue(eq.midFreq);
-            midGainKnob._setValue(eq.midGain);
-            handleChangeFor(2)(eq.midFreq); handleChangeFor(3)(eq.midGain);
-          } else {
-            eq.highFreq = eqHighXToFreq(x); eq.highGain = gain;
-            regKnobs.highFreq._setValue(eq.highFreq);
-            regKnobs.highGain._setValue(eq.highGain);
-            handleChangeFor(5)(eq.highFreq); handleChangeFor(6)(eq.highGain);
+          const freq = axis === 'y' ? startFreq : b.xToFreq(x);
+          const gain = axis === 'x' ? startGain : eqYToGain(y);
+          // Send only what changed, so a locked drag sends one parameter.
+          if (freq !== eq[b.freqKey]) {
+            eq[b.freqKey] = freq;
+            b.freqKnob._setValue(freq);
+            handleChangeFor(b.freqOffset)(freq);
+          }
+          if (gain !== eq[b.gainKey]) {
+            eq[b.gainKey] = gain;
+            b.gainKnob._setValue(gain);
+            handleChangeFor(b.gainOffset)(gain);
           }
           updateCurve();
         };
@@ -10814,12 +10877,58 @@
     return knob;
   }
 
+  // Each visible grid gets a max-height that ends it (plus its panel's bottom
+  // padding) at the bottom of #content, so #content doesn't scroll and the
+  // rows scroll inside the grid (Landmine #130). Refits when #content resizes
+  // (window) and when a grid appears, is shown or changes size; a grid's own
+  // scrollbar moves into the panel's right padding so the columns keep their
+  // width. Below FULL_GRID_MIN_HEIGHT_PX the page scrolls as before.
+  // One scroll position per panel, shared by its grids: switching Timbres <->
+  // Control (Tracks <-> Control) keeps the same row at the same place on
+  // screen, as the page scroll did (the grids' rows are the same height). A
+  // grid takes it each time it is shown, including a re-render's new grid
+  // (e.g. after picking a timbre's Program), once it has its max-height.
+  const FULL_GRID_MIN_HEIGHT_PX = 240;
+  const fullGridScrollTops = new Map();
+  const fullGridScrollKey = (grid) => grid.closest('.panel')?.id;
+  function fitFullGridsToContent() {
+    const content = document.getElementById('content');
+    const contentRect = content.getBoundingClientRect();
+    const contentPadBottom = parseFloat(getComputedStyle(content).paddingBottom) || 0;
+    document.querySelectorAll('.combi-full-grid').forEach((grid) => {
+      if (!grid.offsetParent) { grid._shown = false; return; } // hidden tab
+      const panelPadBottom = parseFloat(getComputedStyle(grid.parentElement).paddingBottom) || 0;
+      const gridTopInContent = grid.getBoundingClientRect().top - contentRect.top + content.scrollTop;
+      const avail = content.clientHeight - contentPadBottom - panelPadBottom - gridTopInContent;
+      const maxHeight = `${Math.max(FULL_GRID_MIN_HEIGHT_PX, Math.floor(avail))}px`;
+      if (grid.style.maxHeight !== maxHeight) grid.style.maxHeight = maxHeight;
+      const scrollbarW = grid.offsetWidth - grid.clientWidth;
+      const marginRight = scrollbarW > 0 ? `-${scrollbarW}px` : '';
+      if (grid.style.marginRight !== marginRight) grid.style.marginRight = marginRight;
+      if (!grid._shown) {
+        grid._shown = true;
+        grid.scrollTop = fullGridScrollTops.get(fullGridScrollKey(grid)) ?? 0;
+      }
+    });
+  }
+  const fullGridObserver = new ResizeObserver((entries) => {
+    // A removed grid reports size 0: stop observing it.
+    for (const { target } of entries) if (!target.isConnected) fullGridObserver.unobserve(target);
+    fitFullGridsToContent();
+  });
+  fullGridObserver.observe(document.getElementById('content'));
+
   function buildCombiFullGridShell(extraClass) {
     const panel = document.createElement('div');
     panel.className = 'combi-full-panel';
     const grid = document.createElement('div');
     grid.className = `combi-full-grid ${extraClass}`;
     panel.appendChild(grid);
+    fullGridObserver.observe(grid);
+    grid.addEventListener('scroll', () => {
+      // Not while hidden: a hidden grid reads 0.
+      if (grid._shown && grid.offsetParent) fullGridScrollTops.set(fullGridScrollKey(grid), grid.scrollTop);
+    });
     return { panel, grid };
   }
   function fullHdr(grid, text) {
@@ -10849,11 +10958,11 @@
   function buildCombiTimbresOnlyContent(combiIndex) {
     const { panel, grid } = buildCombiFullGridShell('combi-full-grid-timbres');
     ['Active', 'Ch', 'Program', 'Level'].forEach(t => fullHdr(grid, t));
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'A:B Pan');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     ['Send C', 'Send D'].forEach(t => fullHdr(grid, t));
-    fullSpacer(grid);
+    fullHdr(grid, '');
     ['Transp', 'Detune'].forEach(t => fullHdr(grid, t));
     fullSep(grid);
     for (let n = 0; n < 8; n++) {
@@ -10925,11 +11034,11 @@
   function buildCombiControlContent(combiIndex) {
     const { panel, grid } = buildCombiFullGridShell('combi-full-grid-control');
     fullHdr(grid, 'Active'); fullHdr(grid, 'Ch'); fullHdr(grid, 'Program'); fullHdr(grid, 'Level');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'Key Window');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'Vel Window');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'PC/DM/AT/CC');
     fullSep(grid);
     for (let n = 0; n < 8; n++) {
@@ -11453,11 +11562,11 @@
     wrap.appendChild(buildCopyFromCombiToolbar());
 
     ['Active', 'Ch', 'Program', 'Level'].forEach(t => fullHdr(grid, t));
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'A:B Pan');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     ['Send C', 'Send D'].forEach(t => fullHdr(grid, t));
-    fullSpacer(grid);
+    fullHdr(grid, '');
     ['Transp', 'Detune'].forEach(t => fullHdr(grid, t));
     fullSep(grid);
     for (let n = 0; n < 16; n++) {
@@ -11534,13 +11643,13 @@
     wrap.appendChild(buildCopyFromCombiToolbar());
 
     fullHdr(grid, 'Active'); fullHdr(grid, 'Ch'); fullHdr(grid, 'Program'); fullHdr(grid, 'Level');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'Bend Range');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'Key Window');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'Vel Window');
-    fullSpacer(grid);
+    fullHdr(grid, '');
     fullHdr(grid, 'PC/DM/AT/CC');
     fullSep(grid);
     for (let n = 0; n < 16; n++) {
@@ -12702,7 +12811,7 @@
   // ─── HELP menu ───────────────────────────────────────────────────────────────
   // Static content only — nothing device- or user-sourced is interpolated
   // (Landmine #34). Keep APP_VERSION in sync with package.json.
-  const APP_VERSION = '1.0.0';
+  const APP_VERSION = '1.0.1';
   const IS_PRERELEASE = APP_VERSION.includes('-'); // rc/beta builds say so in About
   const REPO_URL = 'https://github.com/Baylo1/x5dr-editor';
   const SITE_URL = 'https://baylo1.github.io/x5dr-editor/';
@@ -12770,7 +12879,7 @@ SOFTWARE.`;
     <h4>Compatible models</h4>
     <p>Built and tested on the <strong>X5DR</strong>. The <strong>X5D</strong> should also work. The <strong>X5</strong> and <strong>05R/W</strong> should be largely compatible but have fewer multisounds and drums, so some sounds and settings may not carry over. The X5, X5D and 05R/W are currently <strong>untested</strong>. If you own one, please tell us how it went (<strong>Help → Report a Problem</strong> → Device report).</p>
     <h4>Auditioning sounds</h4>
-    <p>Apart from a short audition note in the Drum Sound Browser, the editor does not send note or controller data, nor does it accept input from a controller keyboard. Module users (X5DR, 05R/W) will need a DAW or another app to send MIDI note and controller data to the device. X5 and X5D owners can use the built-in keyboard.</p>
+    <p>Apart from a short audition note in the Drum Sound Browser and the <strong>All Notes Off</strong> button, the editor does not send note or controller data, nor does it accept input from a controller keyboard. Module users (X5DR, 05R/W) will need a DAW or another app to send MIDI note and controller data to the device. X5 and X5D owners can use the built-in keyboard.</p>
     <h4>How editing works</h4>
     <ul>
       <li>Program and Combination edits are sent to the device as you move controls. Use <strong>Write In Place</strong> to store them, or its drop-down to <strong>Write To A New Slot…</strong>. <strong>Discard</strong> reverts unwritten edits.</li>
@@ -12784,7 +12893,7 @@ SOFTWARE.`;
       <li>In the Multisound, Drum Sound and Effect Type browsers, click a <strong>category button</strong> to show just that category. <strong>Shift-click</strong> (or Ctrl/Cmd-click) to add or remove more, so you see them together; <strong>All</strong> clears them.</li>
       <li><strong>Initialize…</strong> buttons for Programs and Combinations start you from a clean, known patch.</li>
       <li>An <strong>Easy</strong> page in Prog collects the most-used Program parameters in one place.</li>
-      <li><strong>Envelopes:</strong> drag a point on the curve to change its time and level together, or hold <strong>Shift</strong> while dragging to change just one. You can also drag a stage's number up or down, or click it to type.</li>
+      <li><strong>Envelopes:</strong> drag a point on the curve to change its time and level together, or hold <strong>Shift</strong> while dragging to change just one. You can also drag a stage's number up or down, or click it to type. The <strong>Parametric EQ</strong> curve works the same way: Shift-drag a point to change just its frequency or its gain.</li>
       <li>Programs and Combinations can be written to their <strong>existing slot or straight to a different slot</strong>.</li>
       <li>Load and save <code>.syx</code> files (<strong>File → Data File…</strong> lets you pick exactly which of Programs, Combinations, Multi, Drums and Global to load or save), or import from and write to the device.</li>
       <li><strong>Every number</strong> beside a knob, fader or envelope can be <strong>dragged up or down</strong> to change it, or <strong>clicked</strong> to type a value.</li>
@@ -12812,6 +12921,8 @@ SOFTWARE.`;
     <p>The file (when loading) or the editor (when saving) has no data for that type. Hover over it to see why. For example, a file saved as "All Data" without Multi track settings can't load Multi.</p>
     <h4>A write or import stalls</h4>
     <p>The editor waits for the device to acknowledge each transfer. If it times out, check the connection above and try again.</p>
+    <h4>A note keeps sounding</h4>
+    <p>Click <strong>All Notes Off</strong> in the header. It stops every note on all 16 MIDI channels, including notes held by a sustain pedal. If a note still sounds, the X5DR may be set to ignore controller messages (its Global MIDI filter, or the DM/CC filter on a Combination timbre or Multi track), so it misses the sustain-pedal release; stop the note from your DAW instead.</p>
     <h4>The X5DR stops answering everything</h4>
     <p>Several large imports in quick succession (All Data, All Programs, All Combinations) can leave the X5DR not answering any request until it is switched off and on again. Leave a few seconds between large imports.</p>
     <h4>The interface doesn't come back after reconnecting it</h4>
@@ -14044,6 +14155,7 @@ SOFTWARE.`;
       pendingParam = null;
     }
     selectedOutput = port;
+    document.getElementById('all-notes-off-btn').disabled = !port;
     // A new port starts clean (Disconnected without one); a rebuild keeps the state.
     if (changed || !port) setDeviceHealth('connected');
     midiAccess.inputs.forEach(input => {
@@ -14160,6 +14272,18 @@ SOFTWARE.`;
   document.getElementById('port-select').addEventListener('change', onPortSelected);
   initChannelSelect();
   document.getElementById('channel-select').addEventListener('change', onChannelSelected);
+  // On all 16 channels, not just the selected one (buildAllNotesOff, Landmine #129).
+  document.getElementById('all-notes-off-btn').addEventListener('click', (e) => {
+    if (!selectedOutput) return;
+    selectedOutput.send(buildAllNotesOff());
+    setStatus('All Notes Off sent on all 16 MIDI channels.');
+    // Restart the flash on every click (remove, reflow, re-add).
+    const btn = e.currentTarget;
+    btn.classList.remove('sent');
+    void btn.offsetWidth;
+    btn.classList.add('sent');
+  });
+  document.getElementById('all-notes-off-btn').addEventListener('animationend', (e) => e.currentTarget.classList.remove('sent'));
 
   // Render PROG once at startup so its no-data placeholder shows.
   renderProgPanel();

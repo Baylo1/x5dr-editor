@@ -2,6 +2,15 @@
 
 All notable changes to the Korg X5DR Editor are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] — 2026-10-22
+
+### Added
+- **All Notes Off** button in the header: stops stuck notes on all 16 MIDI channels (it also releases the sustain pedal and cuts release tails), and flashes to confirm.
+- **Parametric EQ curve:** hold **Shift** while dragging a point to change just its frequency or just its gain, as on the envelopes.
+
+### Changed
+- **Combination and Multi** Timbres, Tracks and Control pages: the list scrolls inside its table, so the column headings and everything above them stay in view.
+
 ## [1.0.0] — 2026-10-15
 
 First public release.
@@ -24,4 +33,5 @@ First public release.
 - **Help:** Getting Started, Troubleshooting, Report a Problem, Copy Diagnostics, About.
 - Three colour themes; installable as an app; runs as a single downloadable file.
 
+[1.0.1]: https://github.com/Baylo1/x5dr-editor/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Baylo1/x5dr-editor/releases/tag/v1.0.0

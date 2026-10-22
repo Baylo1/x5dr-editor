@@ -15,12 +15,12 @@
 
 | # | Topic | Landmines |
 |---|---|---|
-| 1 | Device modes, ACK/NAK, timeouts, MIDI channel | 1, 2, 3, 4, 6, 7, 18, 19, 21, 24, 38, 41, 43, 48, 54, 57, 60, 62, 104, 112, 114, 115, 116, 118, 119, 120, 121, 126 |
+| 1 | Device modes, ACK/NAK, timeouts, MIDI channel | 1, 2, 3, 4, 6, 7, 18, 19, 21, 24, 38, 41, 43, 48, 54, 57, 60, 62, 104, 112, 114, 115, 116, 118, 119, 120, 121, 126, 129 |
 | 2 | Wire formats, dump layout, packing, encodings | 5, 10, 12, 13, 14, 17, 20, 22, 23, 25, 35, 42, 44, 45, 47, 53, 55, 56, 111, 122 |
 | 3 | Effects (layout, Balance, MG Status) | 9, 11, 16, 52, 89, 90, 93, 94, 108, 109 |
 | 4 | Store, dirty state, write/discard | 26, 27, 32, 36, 37, 51, 59, 61, 110, 113 |
 | 5 | Program / Combi / Multi / Global / Drums specifics | 33, 39, 40, 46, 49, 50, 58, 63, 64, 65, 75, 76, 88, 102 |
-| 6 | UI components and CSS layout | 15, 28, 29, 30, 31, 34, 66, 67, 68, 70, 71, 72, 73, 74, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 91, 92, 96, 97, 98, 99, 100, 101, 105, 106, 107, 117, 124, 127, 128 |
+| 6 | UI components and CSS layout | 15, 28, 29, 30, 31, 34, 66, 67, 68, 70, 71, 72, 73, 74, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 91, 92, 96, 97, 98, 99, 100, 101, 105, 106, 107, 117, 124, 127, 128, 130 |
 | 7 | Tooling (routing, dev server, tests, git, build) | 8, 69, 80, 95, 103, 123, 125 |
 
 ---
@@ -71,7 +71,7 @@
 
 **115. ⚑ CONTRACT — Every send-and-await helper arms its reply through `armAckReply`/`armWriteReply`, never a bare `awaitingWriteAck = true`.** With SysEx reception disabled the device answers nothing, not even a NAK. Dump timeout = `ACK_TIMEOUT_BASE_MS` (5000) + `ACK_TIMEOUT_PER_BYTE_MS` (0.4) × bytes — an All Data dump takes ~11s just to transmit. Helpers resolve `'timeout'`; each caller must not mislabel it (e.g. as "No data loaded"). Expose each via `withTimeoutRetry` (a `…Once` function is one attempt) for the Retry/OK modal, and hide the freeze overlay while that modal is up. Live Parameter Changes are fire-and-forget: a NAK is detected, silence is not. `HW` *(Archive #185)*
 
-**116. ⚑ CONTRACT — Every MIDI send takes its channel from the selector: `sysexHeader()` for SysEx, `0xC0 | getSysexChannel()` (etc.) for channel messages — never a literal `0x30` header or bare `0xC0`/`0x90`/`0x80`.** Response checkers (`isAck`, `isNak`, …) accept any `3g`. `SYSEX_HEADER` is the channel-1 constant for tests only. After editing a JS string in `index.html`, run `node --check` on the extracted module script — one unescaped apostrophe takes down the whole page. `HW` *(Archive #186)*
+**116. ⚑ CONTRACT — Every MIDI send takes its channel from the selector: `sysexHeader()` for SysEx, `0xC0 | getSysexChannel()` (etc.) for channel messages — never a literal `0x30` header or bare `0xC0`/`0x90`/`0x80`.** (One deliberate exception: All Notes Off, #129.) Response checkers (`isAck`, `isNak`, …) accept any `3g`. `SYSEX_HEADER` is the channel-1 constant for tests only. After editing a JS string in `index.html`, run `node --check` on the extracted module script — one unescaped apostrophe takes down the whole page. `HW` *(Archive #186)*
 
 **118. `midiAccess.onstatechange` fires on an output's first `send()` (implicit open) as well as on hot-plug, so rebuilding the port list must keep the current selection.** `populatePortSelect` keeps the user's choice by name (`preferredPortName`, localStorage `x5dr-midi-port`) and falls back to the "x5" auto-select only when the user hasn't chosen; `setSelectedOutput` resets `editMode`/`pendingParam` only when the output really changes. Chrome keeps unplugged ports in the map with `state === 'disconnected'` (sending throws), so they're filtered out. Chrome doesn't pick up a port *renamed* in Audio MIDI Setup until it is restarted (no `statechange`). `HW` *(Archive #190)*
 
@@ -82,6 +82,8 @@
 **121. The header pill shows device health and is set only through `setDeviceHealth(state)`** (`disconnected`/`connected`/`no-response`/`rejected`). The amber states come only from awaited exchanges (`armAckReply`/`armWriteReply` timeouts and NAKs, the dump-request watchdog) and from NAK/format-error replies, never from a live-edit path (#115). Any answer from the device clears them. `setSelectedOutput` resets them only on a real port change, because port-list rebuilds fire on hot-plug and implicit open (#118). `CODE` *(Archive #196)*
 
 **126. A NAK can answer a dump request, not just a Parameter Change.** Single Program (Func=`10`) is answered only in Program/Prog Edit and Single Combination (Func=`19`) only in Combination/Combi Edit; in another mode the device sends `24` (a power cycle can leave it elsewhere). `handleSysexMessage` routes a NAK that arrives while `awaitingDump` to `refuseDumpRequest()` (ends the request, its own box) and ignores further NAKs for `DUMP_NAK_IGNORE_MS` (500, Chrome repeats them, #7); it must never reach the Parameter Change recovery (#4). `HW` *(Archive #217, #218)*
+
+**129. All Notes Off is the one deliberate exception to #116: `buildAllNotesOff()` (`sysex.js`) sends on all 16 channels, not `getSysexChannel()`.** Combi timbres and Multi tracks each listen on their own channel, so the selected channel alone misses most of them. Per channel: CC 64 = 0, CC 120, CC 123, in one `send()`. CC 123 is always received; CC 64/120 only with the Control Filter enabled (Global, or a timbre/track's DM/CC filter), otherwise ignored. `MANUAL` *(Archive #236)*
 
 ---
 
@@ -289,6 +291,7 @@
 **128. Item grids are row-major, and their arrow keys go through `src/ui/gridNav.js`.** `buildSoundGridTable`, `buildPatchTable`, `buildKitSummaryTable` and the Drums tab slot grid place item `i` at row `floor(i / cols)`, column `i % cols` — never `c * rows + r` (a scrolled 430-item column order looked like missing numbers). Keyboard moves use `gridArrowTarget` (`gridArrowTargetSkipping` for disabled cells): Left/Right ±1 wrapping rows; Up/Down ±cols, continuing at the top/bottom of the adjacent column; `null` at the ends. A new grid reuses it rather than hand-rolling deltas. `CODE` *(Archive #223)*
 
 **124. An inline SVG that defines an `id` (a `<marker>`, gradient, clipPath) and references it with `url(#id)` must get a unique id per copy.** `url(#id)` resolves to the *first* element with that id in the whole page, and a marker inside a hidden (`display: none`) tab draws nothing — so PROG, COMBI and MULTI showing the same placement diagram left the later copies without arrows. `buildPlacementDiagram` suffixes every `arrow-eff-*` id with a per-call counter; any new id-bearing SVG template needs the same. `CODE` *(Archive #201)*
+**130. Combi/Multi grids (Timbres, Tracks, both Controls) scroll inside themselves, not in `#content`.** `.combi-full-grid` is `overflow-y: auto`; `fitFullGridsToContent()` (a `ResizeObserver` on `#content` and on each grid from `buildCombiFullGridShell`) sets each visible grid's `max-height` so it ends at `#content`'s bottom, so nothing above it moves (min 240px, then the page scrolls). A classic scrollbar's width goes into a negative `margin-right` (into the panel's padding) so the 1fr spacers don't shrink (#99). One scroll position per panel (`fullGridScrollTops`, keyed by panel id), shared by its grids and applied each time a grid is shown (tab switch, nav return, a re-render's new grid), so Timbres↔Control and Tracks↔Control keep the same row at the same place on screen, as the page scroll did — this relies on the paired grids having equal row heights and the same top. A hidden grid's scroll events are ignored (it reads 0). Column headings are `position: sticky; top: 0` in the grid; the 1fr spacers' headings are empty `fullHdr(grid, '')` cells so the backing is continuous; each heading's `::before` covers half the column gap (1.75rem) each side, none past the grid's edges, and redraws the rule 1px below, exactly over the first `.combi-full-sep`. *Corrected 2026-10-22:* the first version stuck the headings under the page-level `.combi-header`, so the area above the table still scrolled away (owner's hardware test). `CODE` *(Archive #236, #237)*
 ---
 
 ## 7. Tooling

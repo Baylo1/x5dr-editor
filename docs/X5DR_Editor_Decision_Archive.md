@@ -5234,3 +5234,51 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Not covered (owner's decision):** the Windows PC wasn't available. Windows Chrome and Edge were hardware-tested in D2 Part 2 from a CI build of the same code (#227); the live site on Windows will first be exercised by users. Progress Log's Known Outliers says so.
 
 **Result:** Stage E (public cut) is complete. The Project Plan's "Test on a clean machine" checkbox is ticked, which closes the Phase 4 checklist. The release stays unannounced until G2 (demo video) and G3 (announcement).
+
+## Decision #236 — v1.0.1: All Notes Off, EQ Shift-Drag Lock, Sticky Combi/Multi Column Headings
+
+**Context:** 2026-10-22, owner request before G2 (demo video). Three small changes, released as `1.0.1`: an end-user app has no API for SemVer to protect, and "v1.1" already names the deferred feature group (Release Plan H2). Branches `feature/all-notes-off`, `feature/eq-axis-lock` and `feature/sticky-grid-headers` (each from `main`), combined with the version bump in `release/v1.0.1`.
+
+**1. All Notes Off (header button, owner's choice over a Device menu item; a stuck note needs one click from any tab).** The X5DR receive table (`01_channel_messages.md` §2-1) lists CC 123 as always enabled ("A"); CC 120 (All Sound Off) and CC 64 (Damper) only with the Control Filter enabled ("C"). Under the MIDI spec CC 123 doesn't release notes held by the damper, so the owner chose the full set: CC 64 = 0, CC 120, CC 123 on every channel 1–16 (Combi timbres and Multi tracks each listen on their own channel), one 144-byte `send()`. `buildAllNotesOff()` in `sysex.js`, tested in `channel.test.js`; the button is enabled only with an output selected and reports in the status bar. Help: Getting Started's Auditioning paragraph names it; Troubleshooting gains "A note keeps sounding". The front-panel page of the X5DR's Global Control Filter isn't in our references, so the Help text doesn't name one. Not yet hardware-tested (Landmine #129).
+
+**2. Parametric EQ Shift-drag.** The EG curves' axis lock (#223) moved into an exported `dragAxisLock(axis, shiftKey, dx, dy)` in `controls.js` (returns `'x'`/`'y'`/`null`; `egCurveWidget` now uses it, behaviour unchanged), with unit tests. `buildParamEqPanel`'s handles use it: Shift locks to the axis moved first (frequency or gain) after 3px; the other value returns to its drag-start value; releasing Shift unlocks. A drag now sends only the parameter(s) whose value changed (before, every move sent both). Checked in the browser with synthetic pointer events: Shift-vertical sent only Mid Gain, Shift-horizontal only Mid Freq, release mid-drag unlocked.
+
+**3. Sticky column headings (Combi Timbres/Control, Multi Tracks/Control).** The headings stick under the sticky `.combi-header` and rows scroll behind them (Landmine #130). Verified in the browser: headings' top equals the header's bottom when scrolled; unscrolled, every grid's `gridTemplateColumns`, first-row offset (47.5px) and height (721/1417px) are identical to `main`.
+
+**Version:** `package.json`, `package-lock.json`, `APP_VERSION` = 1.0.1; CHANGELOG `[1.0.1] — Unreleased`. Tests: 16 files, 515 tests; build OK; built file checked on port 5520 (About shows 1.0.1, no console errors).
+
+**Next:** owner hardware test of the `release/v1.0.1` CI artifact (All Notes Off with a held note, including one held by sustain, in Program, Combi and Multi mode; EQ Shift-drag heard on the device), then merge, date the CHANGELOG, tag and release (and the backup refresh), then G2.
+
+## Decision #237 — v1.0.1 Hardware Test; Combi/Multi Rows Now Scroll Inside the Table
+
+**Context:** 2026-10-22, owner's hardware test of the `release/v1.0.1` CI artifact (`x5dr-editor-release-v1.0.1-9ede653`) on the X5DR.
+
+**Results:** All Notes Off — works as expected. Parametric EQ Shift-drag — works as expected. Sticky headings — worked, but the owner wanted the table's top to stay put: the page still scrolled until the heading row met the title bar, losing the gap above the table and, on Multi, the Copy From Combination… button. Rows must not show in any gap above the heading row.
+
+**Change (`feature/sticky-grid-headers`, `f705081`, merged into `release/v1.0.1`):** the grid itself became the scroll box (Landmine #130, rewritten). `#content` no longer scrolls on these tabs while there is room for at least 240px of grid; the headings stick to the grid's top, and rows are clipped at the grid's edge, so they can't show above the headings. #236's `--combi-header-h`/`trackStickyHeaderHeight` approach is gone.
+
+**Found while doing it:** picking a timbre's or track's Program (and Initialize, Discard, a dump, Copy From Combination) re-renders the whole panel. With the page scrolling this kept its position; a new grid would start at the top, so each grid's scroll position is remembered and restored.
+
+**Verified in the browser (1440×900 and 1440×620):** `#content` has no overflow on Combi Timbres/Control and Multi Tracks/Control; grid `max-height` 569px (Combi) / 530px (Multi, below the Copy From Combination… button) and 250px at 620px tall, refitted on resize; headings' top = grid top when scrolled; a 15px classic scrollbar (simulated with `::-webkit-scrollbar`) gave `margin-right: -15px`, unchanged `gridTemplateColumns`, scrollbar inside the panel padding; Multi Tracks scrolled to 600px kept 600px after picking track 14's Program. Not checked on Windows itself.
+
+**Next:** owner re-tests item 3 from the new `release/v1.0.1` CI artifact; then merge, date the CHANGELOG, tag, release.
+
+## Decision #238 — Combi/Multi Tables Share One Scroll Position per Panel
+
+**Context:** 2026-10-22, owner's visual test of #237's in-table scrolling (`release/v1.0.1` artifact `d1c65a7`): it works, but loses a behaviour the page scroll gave for free. Scrolled to Multi Track 13 on Tracks, switching to Control showed Track 13's controls at exactly the same place on screen; with a scroll box per grid, the other tab started at the top.
+
+**Change (`feature/sticky-grid-headers`, merged into `release/v1.0.1`):** `fullGridScrollTops` is keyed by panel id only, so a panel's grids share one position; `fitFullGridsToContent()` applies it each time a grid goes from hidden to shown (`grid._shown`), not just once. Scroll events from a hidden grid are ignored: the browser delivers a scroll event a frame late, and a grid hidden in the meantime reads 0 (found when a test scrolled and switched tab in the same task). Landmine #130 updated.
+
+**Verified in the browser (1440×900):** Multi Tracks scrolled to 620 → Control: Track 13's row top 727px on both; Multi Control at 300 → Effect → Tracks: Track 6 at 438px on both, scroll 300; Combi Timbres at 150 → Control: Timbre 7 at 636px on both. The paired grids' rows are equal height (Combi 721px, Multi 1417px tall, same top), which this relies on.
+
+**Next:** owner re-tests from the new `release/v1.0.1` CI artifact.
+
+## Decision #239 — All Notes Off Button Flashes When Sent; Table Scrolling Re-Test Passed
+
+**Context:** 2026-10-22. The owner's visual re-test of #238 (`release/v1.0.1` artifact `6c0a325`) passed: in-table scrolling and the shared Timbres/Tracks ↔ Control position work. The owner then asked for visible feedback when All Notes Off is clicked.
+
+**Change (`feature/all-notes-off`, merged into `release/v1.0.1`):** the button gets class `sent`, a 600ms `all-notes-off-flash` animation from the theme's accent fill (`--accent-fill`, text `--bg-page`) back to its normal colours; the class is removed on `animationend` and restarted (remove, reflow, add) on every click. Sending is unchanged: one `send()`, status-bar message.
+
+**Verified in the browser** (stand-in MIDI port): one send per click; frame 0 background = `--accent-fill` (rgb 255,171,74 in Warm Graphite), 300ms in = rgb 111,81,46, after the animation the normal rgb 44,39,33 with the class removed.
+
+**Next:** owner checks the flash from the new `release/v1.0.1` CI artifact; then merge, date the CHANGELOG, tag, release.

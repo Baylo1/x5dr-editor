@@ -14,7 +14,7 @@ A free, browser-based editor and librarian for the **Korg X5DR** synthesizer mod
 
 ## Features
 
-- Every **Program** parameter, on six pages (Easy, OSC, VDF, VDA, Control, Effect), with envelope displays. Edits are heard as you move a control.
+- Every **Program** parameter, on six pages (Easy, OSC, VDF, VDA, Control, Effect), with envelope displays and a Parametric EQ curve you can drag (hold Shift to change just one value). Edits are heard as you move a control.
 - **Combinations**, **Multi**, **Global** and both **Drum Kits**, including which Programs and Combinations use each kit.
 - All 47 **effect types**, with routing diagrams.
 - **Write In Place** or **Write To A New Slot…**; **Discard Edits** reverts anything not yet written.
@@ -22,6 +22,7 @@ A free, browser-based editor and librarian for the **Korg X5DR** synthesizer mod
 - **Initialize…** for Programs and Combinations: start from a clean patch.
 - **File → Data File…** loads or saves exactly the parts you choose: Programs, Combinations, Multi, Drums, Global. Single Programs and Combinations too.
 - **Device → Import From Device / Write to Device** for every data type.
+- **All Notes Off** in the header stops stuck notes on every MIDI channel.
 - Three colour themes.
 
 ## Requirements
@@ -47,7 +48,7 @@ A free, browser-based editor and librarian for the **Korg X5DR** synthesizer mod
 4. **Choose the port:** ports with "X5" in their name are selected automatically; otherwise pick your interface's output. Some MIDI drivers let only one program use a port at a time: if the port is missing or won't open, close your DAW and reload the editor.
 5. **Allow MIDI** when the browser asks.
 
-The editor sends no notes. To hear a sound, play it from a keyboard or a DAW, through the same MIDI interface.
+The editor sends no notes. To hear a sound, play it from a keyboard or a DAW, through the same MIDI interface. If a note gets stuck, click **All Notes Off** in the header.
 
 ## Ways to run it
 
