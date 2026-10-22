@@ -3347,7 +3347,7 @@
     knobUnidirectional, knobBidirectional, threeWayToggle,
     dualHandleRangeSlider, egCurveWidget, toggleButtonGroup, checkboxCtrl,
     knobWithOverride, buildReadout, verticalFaderCentered, SMALL_KNOB_SIZE, DEFAULT_KNOB_SIZE,
-    HERO_KNOB_SIZE, HERO_VALUE_FONT_SIZE, beginPointerDrag, svgEl,
+    HERO_KNOB_SIZE, HERO_VALUE_FONT_SIZE, beginPointerDrag, svgEl, dragAxisLock,
   } from './ui/controls.js';
 
   // ─── Cross-tab shared parameters ─────────────────────────────────────────────
@@ -7898,28 +7898,40 @@
     }
     updateCurve();
 
+    // Per band: its eq keys, knobs and param offsets.
+    const EQ_BANDS = {
+      low:  { freqKey: 'lowFreq',  gainKey: 'lowGain',  freqKnob: regKnobs.lowFreq,  gainKnob: regKnobs.lowGain,  freqOffset: 0, gainOffset: 1, xToFreq: eqLowXToFreq },
+      mid:  { freqKey: 'midFreq',  gainKey: 'midGain',  freqKnob: midFreqKnob,       gainKnob: midGainKnob,       freqOffset: 2, gainOffset: 3, xToFreq: eqMidXToFreq },
+      high: { freqKey: 'highFreq', gainKey: 'highGain', freqKnob: regKnobs.highFreq, gainKnob: regKnobs.highGain, freqOffset: 5, gainOffset: 6, xToFreq: eqHighXToFreq },
+    };
+
     handles.forEach(({ band, hitEl }) => {
       hitEl.addEventListener('pointerdown', (e) => {
+        const b = EQ_BANDS[band];
+        const startClientX = e.clientX;
+        const startClientY = e.clientY;
+        const startFreq = eq[b.freqKey];
+        const startGain = eq[b.gainKey];
+        // Shift locks the drag to the axis moved first (x = Freq, y = Gain);
+        // the other value goes back to where it started, as on the EG curves.
+        let axis = null;
         const onMove = (ev) => {
+          axis = dragAxisLock(axis, ev.shiftKey, ev.clientX - startClientX, ev.clientY - startClientY);
           const rect = svg.getBoundingClientRect();
           const x = eqClamp((ev.clientX - rect.left) / rect.width * EQ_CURVE_W, 0, EQ_CURVE_W);
           const y = eqClamp((ev.clientY - rect.top) / rect.height * EQ_CURVE_H, 0, EQ_CURVE_H);
-          const gain = eqYToGain(y);
-          if (band === 'low') {
-            eq.lowFreq = eqLowXToFreq(x); eq.lowGain = gain;
-            regKnobs.lowFreq._setValue(eq.lowFreq);
-            regKnobs.lowGain._setValue(eq.lowGain);
-            handleChangeFor(0)(eq.lowFreq); handleChangeFor(1)(eq.lowGain);
-          } else if (band === 'mid') {
-            eq.midFreq = eqMidXToFreq(x); eq.midGain = gain;
-            midFreqKnob._setValue(eq.midFreq);
-            midGainKnob._setValue(eq.midGain);
-            handleChangeFor(2)(eq.midFreq); handleChangeFor(3)(eq.midGain);
-          } else {
-            eq.highFreq = eqHighXToFreq(x); eq.highGain = gain;
-            regKnobs.highFreq._setValue(eq.highFreq);
-            regKnobs.highGain._setValue(eq.highGain);
-            handleChangeFor(5)(eq.highFreq); handleChangeFor(6)(eq.highGain);
+          const freq = axis === 'y' ? startFreq : b.xToFreq(x);
+          const gain = axis === 'x' ? startGain : eqYToGain(y);
+          // Send only what changed, so a locked drag sends one parameter.
+          if (freq !== eq[b.freqKey]) {
+            eq[b.freqKey] = freq;
+            b.freqKnob._setValue(freq);
+            handleChangeFor(b.freqOffset)(freq);
+          }
+          if (gain !== eq[b.gainKey]) {
+            eq[b.gainKey] = gain;
+            b.gainKnob._setValue(gain);
+            handleChangeFor(b.gainOffset)(gain);
           }
           updateCurve();
         };
@@ -12784,7 +12796,7 @@ SOFTWARE.`;
       <li>In the Multisound, Drum Sound and Effect Type browsers, click a <strong>category button</strong> to show just that category. <strong>Shift-click</strong> (or Ctrl/Cmd-click) to add or remove more, so you see them together; <strong>All</strong> clears them.</li>
       <li><strong>Initialize…</strong> buttons for Programs and Combinations start you from a clean, known patch.</li>
       <li>An <strong>Easy</strong> page in Prog collects the most-used Program parameters in one place.</li>
-      <li><strong>Envelopes:</strong> drag a point on the curve to change its time and level together, or hold <strong>Shift</strong> while dragging to change just one. You can also drag a stage's number up or down, or click it to type.</li>
+      <li><strong>Envelopes:</strong> drag a point on the curve to change its time and level together, or hold <strong>Shift</strong> while dragging to change just one. You can also drag a stage's number up or down, or click it to type. The <strong>Parametric EQ</strong> curve works the same way: Shift-drag a point to change just its frequency or its gain.</li>
       <li>Programs and Combinations can be written to their <strong>existing slot or straight to a different slot</strong>.</li>
       <li>Load and save <code>.syx</code> files (<strong>File → Data File…</strong> lets you pick exactly which of Programs, Combinations, Multi, Drums and Global to load or save), or import from and write to the device.</li>
       <li><strong>Every number</strong> beside a knob, fader or envelope can be <strong>dragged up or down</strong> to change it, or <strong>clicked</strong> to type a value.</li>

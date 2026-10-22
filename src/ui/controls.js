@@ -900,6 +900,19 @@ function buildEgPathD(startLevel, points, mode, levelMin, levelMax, height, tota
 
 const EG_AXIS_LOCK_THRESHOLD_PX = 3;
 
+/**
+ * Shift-drag axis lock, shared by the EG curves and the Parametric EQ curve:
+ * with Shift held, the drag locks to the axis moved first ('x' or 'y') once
+ * the pointer is EG_AXIS_LOCK_THRESHOLD_PX from where it started; releasing
+ * Shift unlocks (null). Call on every move with the previous result.
+ */
+export function dragAxisLock(axis, shiftKey, dxPx, dyPx) {
+  if (!shiftKey) return null;
+  if (axis) return axis;
+  if (Math.max(Math.abs(dxPx), Math.abs(dyPx)) < EG_AXIS_LOCK_THRESHOLD_PX) return null;
+  return Math.abs(dxPx) >= Math.abs(dyPx) ? 'x' : 'y';
+}
+
 export function egCurveWidget(config, onChange) {
   const {
     mode = 'floor', levelMin = 0, levelMax = 99,
@@ -1060,23 +1073,20 @@ export function egCurveWidget(config, onChange) {
       const startTime = stages[stageIndex].time;
       const startLevelVal = stages[stageIndex].level;
       const timeMax = config.timeMax ?? 99;
-      // Shift locks the drag to the axis moved first ('time' or 'level'); the
-      // other value goes back to where it started. Releasing Shift unlocks
-      // (Archive #223).
+      // Shift locks the drag to the axis moved first (x = time, y = level);
+      // the other value goes back to where it started. Releasing Shift
+      // unlocks (Archive #223).
       let axis = null;
       const onMove = (ev) => {
         const dxPx = ev.clientX - startClientX;
         const dyPx = ev.clientY - startClientY;
-        if (!ev.shiftKey) axis = null;
-        else if (!axis && Math.max(Math.abs(dxPx), Math.abs(dyPx)) >= EG_AXIS_LOCK_THRESHOLD_PX) {
-          axis = Math.abs(dxPx) >= Math.abs(dyPx) ? 'time' : 'level';
-        }
+        axis = dragAxisLock(axis, ev.shiftKey, dxPx, dyPx);
         if (stageConfig.timeEditable !== false) {
-          const dt = axis === 'level' ? 0 : dxPx / pxPerUnitX / (config.pxPerTimeUnit ?? EG_DEFAULT_PX_PER_TIME);
+          const dt = axis === 'y' ? 0 : dxPx / pxPerUnitX / (config.pxPerTimeUnit ?? EG_DEFAULT_PX_PER_TIME);
           stages[stageIndex].time = clamp(Math.round(startTime + dt), 0, timeMax);
         }
         if (stageConfig.levelEditable !== false) {
-          const dLevelPx = axis === 'time' ? 0 : dyPx / pxPerUnitY;
+          const dLevelPx = axis === 'x' ? 0 : dyPx / pxPerUnitY;
           stages[stageIndex].level = clamp(Math.round(startLevelVal + dLevelFromPx(dLevelPx)), levelMin, levelMax);
         }
         render();

@@ -6,6 +6,7 @@ import {
   knobUnidirectional, knobBidirectional, threeWayToggle,
   dualHandleRangeSlider, egGeometry, egMapY, egCurveWidget,
   toggleButtonGroup, checkboxCtrl, knobWithOverride, buildReadout, beginPointerDrag,
+  dragAxisLock,
 } from './controls.js';
 
 // A centered readout (inside a knob) opens its editor on a press released
@@ -879,5 +880,24 @@ describe('an open number editor ends on a press elsewhere (Archive #223)', () =>
     beginPointerDrag(e, handle, () => {});
     expect(document.activeElement).not.toBe(field);
     document.body.innerHTML = '';
+  });
+});
+
+describe('dragAxisLock', () => {
+  it('stays unlocked without Shift', () => {
+    expect(dragAxisLock(null, false, 40, 2)).toBe(null);
+    expect(dragAxisLock('x', false, 40, 2)).toBe(null); // releasing Shift unlocks
+  });
+
+  it('waits for 3px of movement, then locks to the larger axis', () => {
+    expect(dragAxisLock(null, true, 2, 1)).toBe(null);
+    expect(dragAxisLock(null, true, 3, 1)).toBe('x');
+    expect(dragAxisLock(null, true, 1, -5)).toBe('y');
+    expect(dragAxisLock(null, true, 4, 4)).toBe('x'); // a tie goes to x
+  });
+
+  it('keeps the first axis for the rest of the Shift-drag', () => {
+    expect(dragAxisLock('x', true, 0, 50)).toBe('x');
+    expect(dragAxisLock('y', true, 50, 0)).toBe('y');
   });
 });
