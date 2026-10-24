@@ -5304,3 +5304,15 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Verified in the browser** (`x5dr-dist`, 1440×900, Factory Bank A loaded, A00 initialized): the Easy, VDA and VDF tabs show the handles spread out, with Decay Time 30 and Slope Time 30 on all four envelopes. Tests: 16 files, 516 passed; build OK.
 
 **Next:** owner checks Initialize from the branch's CI artifact on hardware (it should still sound organ-style), then merge.
+
+**Hardware check (2026-10-24):** passed (owner). Released as `v1.0.2` (#242).
+
+## Decision #242 — v1.0.2 Released
+
+**Context:** 2026-10-24. The owner's hardware check of #241 passed; the owner asked Claude to update the docs, merge to `main` and publish (the owner's instruction in this session, as at #240).
+
+**Release branch `release/v1.0.2`** (from `fix/init-prog-eg-times`): version 1.0.2 in `package.json`, `package-lock.json` and `APP_VERSION`; CHANGELOG `[1.0.2]` dated 2026-10-24, with its release link. README and screenshots need no change (Init Prog's envelopes aren't in them).
+
+**Release:** merged to `main` with `--no-ff`; annotated tag `v1.0.2` ("X5DR Editor v1.0.2"); Release "X5DR Editor v1.0.2" published from it with the CHANGELOG section as notes.
+
+**Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release", `x5dr-editor-v1.0.2.bundle`); then G2 demo video, G3 announcement.
