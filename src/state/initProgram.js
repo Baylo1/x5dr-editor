@@ -22,7 +22,9 @@ const initOsc = () => ({
 });
 
 // Organ-style envelope: instant attack to full level, no decay dip, full
-// sustain, a short (not instant — avoids a click) release.
+// sustain, a short (not instant — avoids a click) release. Decay/Slope Time
+// are 30, not 0, only so the envelope display's handles don't stack on each
+// other — Attack Level = Break Point = Sustain Level, so they're inaudible.
 const initVda = () => ({
   kbdTrackKey: 60, // C4 — irrelevant, kbdTrackInt is 0
   kbdTrackInt: 0,
@@ -31,8 +33,8 @@ const initVda = () => ({
   egTimeVelSense: 0,
   eg: {
     attackTime: 0, attackLevel: 99,
-    decayTime: 0, breakPoint: 99,
-    slopeTime: 0, sustainLevel: 99,
+    decayTime: 30, breakPoint: 99, // pick — handle spacing only (see above)
+    slopeTime: 30, sustainLevel: 99,
     releaseTime: 15, // pick — short but click-free; instant (0) can pop
   },
   egTimeKbdMod: 0,
@@ -42,7 +44,8 @@ const initVda = () => ({
 
 // Filter fully open; every envelope/tracking/color amount at 0 — cutoff
 // alone (99) defines the sound, everything else is inert until the user
-// dials it in.
+// dials it in. Decay/Slope Time are 30 so the envelope display's handles
+// don't stack; inert while egIntensity is 0.
 const initVdf = () => ({
   cutoff: 99, // fully open
   kbdTrackKey: 60, // irrelevant, kbdTrackMode/cutoffKbdTrack are 0
@@ -54,8 +57,8 @@ const initVdf = () => ({
   egTimeVelSense: 0,
   eg: {
     attackTime: 0, attackLevel: 0,
-    decayTime: 0, breakPoint: 0,
-    slopeTime: 0, sustainLevel: 0,
+    decayTime: 30, breakPoint: 0, // pick — handle spacing only (see above)
+    slopeTime: 30, sustainLevel: 0,
     releaseTime: 0, releaseLevel: 0,
   },
   colorIntensity: 0,

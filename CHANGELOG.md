@@ -2,6 +2,11 @@
 
 All notable changes to the Korg X5DR Editor are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- **Initialize Patch:** VDF and VDA envelopes start with Decay Time and Slope Time 30 instead of 0, so their handles no longer sit on top of each other. The sound is unchanged.
+
 ## [1.0.1] — 2026-10-22
 
 ### Added

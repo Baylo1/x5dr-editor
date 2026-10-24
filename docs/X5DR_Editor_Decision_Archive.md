@@ -5294,3 +5294,13 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Branches:** `feature/all-notes-off`, `feature/eq-axis-lock`, `feature/sticky-grid-headers` and `release/v1.0.1` are merged and stay on the remote.
 
 **Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release": refresh the mirror, `x5dr-editor-v1.0.1.bundle`, verify, copy to iCloud Drive). Then G2 demo video, G3 announcement.
+
+## Decision #241 — Init Prog: VDF/VDA Decay and Slope Time 30
+
+**Context:** 2026-10-24, owner request. In Init Prog, every VDF/VDA envelope's Decay Time and Slope Time were 0, so the Attack, Decay and Slope handles sat on top of each other in the envelope displays and were hard to grab.
+
+**Change (`fix/init-prog-eg-times`):** `initVda`/`initVdf` (`src/state/initProgram.js`) set `eg.decayTime` and `eg.slopeTime` to 30. This covers VDF-1/2 and VDA-1/2 (both use the same builder). Nothing should sound different: in VDA, Attack Level = Break Point = Sustain Level = 99, so the two extra segments are flat; VDF's EG Intensity is 0. Init Combi doesn't use these blocks. New test in `initProgram.test.js`; the round-trip test covers the new values.
+
+**Verified in the browser** (`x5dr-dist`, 1440×900, Factory Bank A loaded, A00 initialized): the Easy, VDA and VDF tabs show the handles spread out, with Decay Time 30 and Slope Time 30 on all four envelopes. Tests: 16 files, 516 passed; build OK.
+
+**Next:** owner checks Initialize from the branch's CI artifact on hardware (it should still sound organ-style), then merge.
