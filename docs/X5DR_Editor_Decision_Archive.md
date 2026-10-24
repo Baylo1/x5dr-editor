@@ -5294,3 +5294,25 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Branches:** `feature/all-notes-off`, `feature/eq-axis-lock`, `feature/sticky-grid-headers` and `release/v1.0.1` are merged and stay on the remote.
 
 **Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release": refresh the mirror, `x5dr-editor-v1.0.1.bundle`, verify, copy to iCloud Drive). Then G2 demo video, G3 announcement.
+
+## Decision #241 — Init Prog: VDF/VDA Decay and Slope Time 30
+
+**Context:** 2026-10-24, owner request. In Init Prog, every VDF/VDA envelope's Decay Time and Slope Time were 0, so the Attack, Decay and Slope handles sat on top of each other in the envelope displays and were hard to grab.
+
+**Change (`fix/init-prog-eg-times`):** `initVda`/`initVdf` (`src/state/initProgram.js`) set `eg.decayTime` and `eg.slopeTime` to 30. This covers VDF-1/2 and VDA-1/2 (both use the same builder). Nothing should sound different: in VDA, Attack Level = Break Point = Sustain Level = 99, so the two extra segments are flat; VDF's EG Intensity is 0. Init Combi doesn't use these blocks. New test in `initProgram.test.js`; the round-trip test covers the new values.
+
+**Verified in the browser** (`x5dr-dist`, 1440×900, Factory Bank A loaded, A00 initialized): the Easy, VDA and VDF tabs show the handles spread out, with Decay Time 30 and Slope Time 30 on all four envelopes. Tests: 16 files, 516 passed; build OK.
+
+**Next:** owner checks Initialize from the branch's CI artifact on hardware (it should still sound organ-style), then merge.
+
+**Hardware check (2026-10-24):** passed (owner). Released as `v1.0.2` (#242).
+
+## Decision #242 — v1.0.2 Released
+
+**Context:** 2026-10-24. The owner's hardware check of #241 passed; the owner asked Claude to update the docs, merge to `main` and publish (the owner's instruction in this session, as at #240).
+
+**Release branch `release/v1.0.2`** (from `fix/init-prog-eg-times`): version 1.0.2 in `package.json`, `package-lock.json` and `APP_VERSION`; CHANGELOG `[1.0.2]` dated 2026-10-24, with its release link. README and screenshots need no change (Init Prog's envelopes aren't in them).
+
+**Release:** merged to `main` with `--no-ff`; annotated tag `v1.0.2` ("X5DR Editor v1.0.2"); Release "X5DR Editor v1.0.2" published from it with the CHANGELOG section as notes.
+
+**Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release", `x5dr-editor-v1.0.2.bundle`); then G2 demo video, G3 announcement.

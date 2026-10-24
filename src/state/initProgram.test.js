@@ -71,6 +71,13 @@ describe('INIT_PROGRAM', () => {
     expect(INIT_PROGRAM.effects.eff2BalanceL).toBe(0);
   });
 
+  it('spaces the VDF/VDA envelope handles with Decay/Slope Time 30', () => {
+    for (const block of ['vdf1', 'vdf2', 'vda1', 'vda2']) {
+      expect(INIT_PROGRAM[block].eg.decayTime, block).toBe(30);
+      expect(INIT_PROGRAM[block].eg.slopeTime, block).toBe(30);
+    }
+  });
+
   it('opens the filter fully with no envelope shaping', () => {
     expect(INIT_PROGRAM.vdf1.cutoff).toBe(99);
     expect(INIT_PROGRAM.vdf1.egIntensity).toBe(0);
