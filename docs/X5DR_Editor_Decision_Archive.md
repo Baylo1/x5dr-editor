@@ -5313,6 +5313,8 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 
 **Release branch `release/v1.0.2`** (from `fix/init-prog-eg-times`): version 1.0.2 in `package.json`, `package-lock.json` and `APP_VERSION`; CHANGELOG `[1.0.2]` dated 2026-10-24, with its release link. README and screenshots need no change (Init Prog's envelopes aren't in them).
 
-**Release:** merged to `main` with `--no-ff`; annotated tag `v1.0.2` ("X5DR Editor v1.0.2"); Release "X5DR Editor v1.0.2" published from it with the CHANGELOG section as notes.
+**Release:** merged to `main` with `--no-ff` (`adf1ec6`); CI green on `main` (16 files, 516 tests, build). Annotated tag `v1.0.2` ("X5DR Editor v1.0.2"); Release "X5DR Editor v1.0.2" published from it with the CHANGELOG section as notes (not a pre-release, marked latest). `deploy.yml` green in 1m6s; `index.html` (1,024,354 bytes) attached. Live site checked: serves `APP_VERSION` 1.0.2, `manifest.json` returns 200.
+
+**Branches:** `fix/init-prog-eg-times` and `release/v1.0.2` are merged and stay on the remote.
 
 **Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release", `x5dr-editor-v1.0.2.bundle`); then G2 demo video, G3 announcement.
