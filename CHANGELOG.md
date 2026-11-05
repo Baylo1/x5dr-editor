@@ -2,7 +2,7 @@
 
 All notable changes to the Korg X5DR Editor are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.0.3] — 2026-11-05
 
 ### Changed
 - **Initialize Patch:** the Pitch EG starts with Attack Time and Decay Time 30 instead of 0, so its handles no longer sit on top of each other (its levels stay at 0).
@@ -44,6 +44,7 @@ First public release.
 - **Help:** Getting Started, Troubleshooting, Report a Problem, Copy Diagnostics, About.
 - Three colour themes; installable as an app; runs as a single downloadable file.
 
+[1.0.3]: https://github.com/Baylo1/x5dr-editor/releases/tag/v1.0.3
 [1.0.2]: https://github.com/Baylo1/x5dr-editor/releases/tag/v1.0.2
 [1.0.1]: https://github.com/Baylo1/x5dr-editor/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Baylo1/x5dr-editor/releases/tag/v1.0.0

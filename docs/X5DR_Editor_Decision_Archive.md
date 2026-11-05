@@ -5328,3 +5328,15 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Verified in the browser** (`x5dr-dist`, 1440×900, Factory Bank A loaded, A00 initialized): the Osc tab's Pitch EG shows Attack Time 30, Decay Time 30 and spread handles; the VDF tab shows EG Intensity 50 on VDF-1 and VDF-2. Tests: 16 files, 517 passed; build OK.
 
 **Next:** owner checks Initialize from the branch's CI artifact on hardware (sound unchanged; a negative VDF EG level is now heard), then release as `v1.0.3`.
+
+**Hardware check (2026-11-05):** passed (owner). Released as `v1.0.3` (#244).
+
+## Decision #244 — v1.0.3 Released
+
+**Context:** 2026-11-05. The owner's hardware check of #243 passed; the owner asked Claude to release (the owner's instruction in this session, as at #240 and #242).
+
+**Release branch `release/v1.0.3`** (from `fix/init-prog-pitch-eg-vdf-int`): version 1.0.3 in `package.json`, `package-lock.json` and `APP_VERSION`; CHANGELOG `[1.0.3]` dated 2026-11-05, with its release link. README and screenshots need no change.
+
+**Release:** merged to `main` with `--no-ff`; annotated tag `v1.0.3` ("X5DR Editor v1.0.3"); Release "X5DR Editor v1.0.3" published from it with the CHANGELOG section as notes.
+
+**Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release", `x5dr-editor-v1.0.3.bundle`); then G2 demo video, G3 announcement.
