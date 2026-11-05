@@ -5318,3 +5318,25 @@ Each needs the owner's check on the hardware-test Mac (CI artifact). For 4 and 5
 **Branches:** `fix/init-prog-eg-times` and `release/v1.0.2` are merged and stay on the remote.
 
 **Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release", `x5dr-editor-v1.0.2.bundle`); then G2 demo video, G3 announcement.
+
+## Decision #243 — Init Prog: Pitch EG Attack/Decay Time 30, VDF EG Intensity 50
+
+**Context:** 2026-11-05, two owner requests for `v1.0.3`, following on from #241. (1) Init Prog's Pitch EG Attack Time and Decay Time were 0, so its handles stacked the same way VDF/VDA's did. (2) VDF-1/2 EG Intensity was 0, so editing a VDF envelope made no audible difference until the user also found and raised EG Intensity.
+
+**Change (`fix/init-prog-pitch-eg-vdf-int`):** `INIT_PROGRAM.pitchEg` sets `attackTime` and `decayTime` to 30 and leaves every level (Start, Attack, Release) at 0. `initVdf` sets `egIntensity` to 50 (range 0–99, TABLE 7-1 param 53/122). Init Prog should still sound the same: Pitch EG Int is 0 and every Pitch EG level is 0, and every VDF EG level is 0, so the EG still moves nothing until a level is edited. Because Cutoff is 99 (fully open), positive VDF EG levels can't open the filter further: only negative levels are heard. Tests in `initProgram.test.js`; the round-trip test covers the new values.
+
+**Verified in the browser** (`x5dr-dist`, 1440×900, Factory Bank A loaded, A00 initialized): the Osc tab's Pitch EG shows Attack Time 30, Decay Time 30 and spread handles; the VDF tab shows EG Intensity 50 on VDF-1 and VDF-2. Tests: 16 files, 517 passed; build OK.
+
+**Next:** owner checks Initialize from the branch's CI artifact on hardware (sound unchanged; a negative VDF EG level is now heard), then release as `v1.0.3`.
+
+**Hardware check (2026-11-05):** passed (owner). Released as `v1.0.3` (#244).
+
+## Decision #244 — v1.0.3 Released
+
+**Context:** 2026-11-05. The owner's hardware check of #243 passed; the owner asked Claude to release (the owner's instruction in this session, as at #240 and #242).
+
+**Release branch `release/v1.0.3`** (from `fix/init-prog-pitch-eg-vdf-int`): version 1.0.3 in `package.json`, `package-lock.json` and `APP_VERSION`; CHANGELOG `[1.0.3]` dated 2026-11-05, with its release link. README and screenshots need no change.
+
+**Release:** merged to `main` with `--no-ff`; annotated tag `v1.0.3` ("X5DR Editor v1.0.3"); Release "X5DR Editor v1.0.3" published from it with the CHANGELOG section as notes.
+
+**Next (owner):** backup refresh on the hardware-test Mac (Release Plan G4 "At each release", `x5dr-editor-v1.0.3.bundle`); then G2 demo video, G3 announcement.

@@ -78,8 +78,22 @@ describe('INIT_PROGRAM', () => {
     }
   });
 
-  it('opens the filter fully with no envelope shaping', () => {
-    expect(INIT_PROGRAM.vdf1.cutoff).toBe(99);
-    expect(INIT_PROGRAM.vdf1.egIntensity).toBe(0);
+  it('spaces the Pitch EG handles with Attack/Decay Time 30, every level 0', () => {
+    expect(INIT_PROGRAM.pitchEg.attackTime).toBe(30);
+    expect(INIT_PROGRAM.pitchEg.decayTime).toBe(30);
+    expect(INIT_PROGRAM.pitchEg.startLevel).toBe(0);
+    expect(INIT_PROGRAM.pitchEg.attackLevel).toBe(0);
+    expect(INIT_PROGRAM.pitchEg.releaseLevel).toBe(0);
+  });
+
+  it('opens the filter fully, with EG Intensity 50 but every VDF EG level 0', () => {
+    for (const block of ['vdf1', 'vdf2']) {
+      const vdf = INIT_PROGRAM[block];
+      expect(vdf.cutoff, block).toBe(99);
+      expect(vdf.egIntensity, block).toBe(50);
+      for (const level of ['attackLevel', 'breakPoint', 'sustainLevel', 'releaseLevel']) {
+        expect(vdf.eg[level], `${block}.eg.${level}`).toBe(0);
+      }
+    }
   });
 });
