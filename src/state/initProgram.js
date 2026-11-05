@@ -42,16 +42,16 @@ const initVda = () => ({
   kbdTrackMode: 0, // Off
 });
 
-// Filter fully open; every envelope/tracking/color amount at 0 — cutoff
-// alone (99) defines the sound, everything else is inert until the user
-// dials it in. Decay/Slope Time are 30 so the envelope display's handles
-// don't stack; inert while egIntensity is 0.
+// Filter fully open; every tracking/color amount at 0 — cutoff alone (99)
+// defines the sound. EG Intensity is 50 so an edit to the EG levels is heard
+// straight away; the levels are all 0, so the EG is still inert until then.
+// Decay/Slope Time are 30 so the envelope display's handles don't stack.
 const initVdf = () => ({
   cutoff: 99, // fully open
   kbdTrackKey: 60, // irrelevant, kbdTrackMode/cutoffKbdTrack are 0
   kbdTrackMode: 0, // Off
   cutoffKbdTrack: 0,
-  egIntensity: 0,
+  egIntensity: 50, // pick — EG edits are audible (see above)
   egTimeKbdTrack: 0,
   egIntVelSense: 0,
   egTimeVelSense: 0,
@@ -76,8 +76,10 @@ export const INIT_PROGRAM = {
   },
   osc1: initOsc(),
   osc2: { ...initOsc(), interval: 0, detune: 0, delayStart: 0 },
+  // Attack/Decay Time 30 only so the envelope display's handles don't stack;
+  // every level is 0 (and Pitch EG Int is 0), so pitch stays flat.
   pitchEg: {
-    startLevel: 0, attackTime: 0, attackLevel: 0, decayTime: 0,
+    startLevel: 0, attackTime: 30, attackLevel: 0, decayTime: 30,
     releaseTime: 0, releaseLevel: 0, egIntVelSense: 0, egTimeVelSense: 0,
   },
   cutoffMg: {

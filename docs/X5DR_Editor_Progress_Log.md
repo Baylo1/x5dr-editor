@@ -21,6 +21,7 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
   - **Stage E done** (#229–#235): private repo frozen at `pre-public-cut` and renamed `x5dr-editor-private` (kept as its bundle, #234); noreply email; public repo from the single commit `ffe1ec8` (94 files), flipped public, `v*` tag rule on `github-pages`; `v1.0.0` published by the owner, deploy green; public repo backed up (mirror + bundle in the hardware-test Mac's `~/Backups/`, bundle in iCloud Drive). E7 first-run pass on a Mac (Chrome incognito, Edge with no profile; Pages and `file://`, incl. install as app): all passed, no friction, no `v1.0.1`. Working copy `~/Developer/x5dr-editor`; the Desktop folder is the frozen private archive (don't edit it).
 - **v1.0.1** (#236–#240): All Notes Off header button (flashes when sent), Shift-drag on the Parametric EQ curve, Combi/Multi rows scroll inside their table with one scroll position shared by a panel's tabs. Hardware-tested by the owner.
 - **v1.0.2** (#241–#242): Init Prog's VDF/VDA Decay and Slope Time are 30, so the envelope handles don't stack. Hardware-tested by the owner.
+- **Unreleased (for `v1.0.3`):** Init Prog's Pitch EG Attack/Decay Time 30, VDF EG Intensity 50 (#243, `fix/init-prog-pitch-eg-vdf-int`; awaiting the owner's hardware check).
 - **Testing:** CI on `main` passes (16 test files, 516 tests, build). Report the file count, not just the pass count (Landmine #80); with subagent worktrees present use `--exclude '.claude/**'` (Landmine #125).
 
 ---
@@ -40,6 +41,7 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 ## Current Next Actions
 
 1. **Phase 4, in order** (Release Plan; the owner's PHASE 4 task list mirrors it, §9):
+   - **Owner:** hardware-check `fix/init-prog-pitch-eg-vdf-int` (#243) from its CI artifact; then release `v1.0.3`.
    - **Next (owner): v1.0.2 backup refresh** on the hardware-test Mac (Release Plan G4: mirror, `x5dr-editor-v1.0.2.bundle`, verify, iCloud Drive).
    - **Then G2** demo video (owner records), then **G3** announce (owner posts; Claude can draft the text). **G4** feedback routine (weekly Issues triage + mirror refresh) can be set up any time. Then H1 housekeeping and the v1.1 group (H2).
    - **Backups:** at every release, refresh the public mirror and make a new bundle in `~/Backups/` (not inside the mirror), verify it, copy it to iCloud Drive (Release Plan G4, #234).
@@ -72,4 +74,4 @@ End of session: update **Current Status** and **Current Next Actions**; new deci
 
 ---
 
-*Last updated: 2026-10-24 — `v1.0.2` released (#242). Next: backup refresh, then G2 demo video, G3 announce.*
+*Last updated: 2026-11-05 — Init Prog Pitch EG / VDF EG Intensity fix on `fix/init-prog-pitch-eg-vdf-int` (#243). Next: owner hardware check, `v1.0.3`, backup refresh, G2, G3.*
